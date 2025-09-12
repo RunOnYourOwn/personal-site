@@ -1,0 +1,293 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+const featuredProjects = projects.filter(project => project.data.featured);
+const otherProjects = projects.filter(project => !project.data.featured);
+
+// Sort by year (newest first)
+const sortByYear = (a: any, b: any) => (b.data.year || 0) - (a.data.year || 0);
+featuredProjects.sort(sortByYear);
+otherProjects.sort(sortByYear);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Projects - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>🚀 Projects</h1>
+			<p>
+				A collection of projects I've worked on, ranging from web applications to infrastructure setups.
+				Each project represents a learning opportunity and a step forward in my development journey.
+			</p>
+
+			{featuredProjects.length > 0 && (
+				<section>
+					<h2>⭐ Featured Projects</h2>
+					<div class="projects-grid">
+						{featuredProjects.map((project) => (
+							<article class="project-card featured">
+								<div class="project-header">
+									<h3>
+										<a href={`/projects/${project.slug}`}>
+											{project.data.title}
+										</a>
+									</h3>
+									{project.data.year && <span class="year">{project.data.year}</span>}
+								</div>
+								<p class="description">{project.data.description}</p>
+								<div class="project-meta">
+									<div class="tags">
+										{project.data.tags.map((tag) => (
+											<span class="tag">{tag}</span>
+										))}
+									</div>
+									<div class="links">
+										{project.data.link && (
+											<a href={project.data.link} target="_blank" rel="noopener noreferrer" class="link">
+												🌐 Live Site
+											</a>
+										)}
+										{project.data.repo && (
+											<a href={project.data.repo} target="_blank" rel="noopener noreferrer" class="link">
+												📁 Repository
+											</a>
+										)}
+									</div>
+								</div>
+								<div class="status">
+									<span class={`status-badge ${project.data.status}`}>
+										{project.data.status.replace('-', ' ')}
+									</span>
+								</div>
+							</article>
+						))}
+					</div>
+				</section>
+			)}
+
+			{otherProjects.length > 0 && (
+				<section>
+					<h2>📁 Other Projects</h2>
+					<div class="projects-grid">
+						{otherProjects.map((project) => (
+							<article class="project-card">
+								<div class="project-header">
+									<h3>
+										<a href={`/projects/${project.slug}`}>
+											{project.data.title}
+										</a>
+									</h3>
+									{project.data.year && <span class="year">{project.data.year}</span>}
+								</div>
+								<p class="description">{project.data.description}</p>
+								<div class="project-meta">
+									<div class="tags">
+										{project.data.tags.map((tag) => (
+											<span class="tag">{tag}</span>
+										))}
+									</div>
+									<div class="links">
+										{project.data.link && (
+											<a href={project.data.link} target="_blank" rel="noopener noreferrer" class="link">
+												🌐 Live Site
+											</a>
+										)}
+										{project.data.repo && (
+											<a href={project.data.repo} target="_blank" rel="noopener noreferrer" class="link">
+												📁 Repository
+											</a>
+										)}
+									</div>
+								</div>
+								<div class="status">
+									<span class={`status-badge ${project.data.status}`}>
+										{project.data.status.replace('-', ' ')}
+									</span>
+								</div>
+							</article>
+						))}
+					</div>
+				</section>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.projects-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 2rem;
+		margin: 2rem 0;
+	}
+
+	.project-card {
+		background: white;
+		border-radius: 12px;
+		padding: 1.5rem;
+		box-shadow: var(--box-shadow);
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+		border: 1px solid rgb(var(--gray-light));
+	}
+
+	.project-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(var(--gray), 25%), 0 12px 32px rgba(var(--gray), 33%);
+	}
+
+	.project-card.featured {
+		border: 2px solid var(--accent);
+		background: linear-gradient(135deg, rgba(var(--accent), 0.05), rgba(var(--accent), 0.02));
+	}
+
+	.project-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 1rem;
+	}
+
+	.project-header h3 {
+		margin: 0;
+		font-size: 1.25rem;
+	}
+
+	.project-header h3 a {
+		color: rgb(var(--black));
+		text-decoration: none;
+	}
+
+	.project-header h3 a:hover {
+		color: var(--accent);
+	}
+
+	.year {
+		background: rgb(var(--gray-light));
+		color: rgb(var(--gray-dark));
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.875rem;
+		font-weight: 500;
+	}
+
+	.description {
+		color: rgb(var(--gray-dark));
+		margin-bottom: 1rem;
+		line-height: 1.6;
+	}
+
+	.project-meta {
+		margin-bottom: 1rem;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.tag {
+		background: var(--accent);
+		color: white;
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 500;
+	}
+
+	.links {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.links .link {
+		color: var(--accent);
+		text-decoration: none;
+		font-size: 0.875rem;
+		font-weight: 500;
+	}
+
+	.links .link:hover {
+		text-decoration: underline;
+	}
+
+	.status {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.status-badge {
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 500;
+		text-transform: capitalize;
+	}
+
+	.status-badge.completed {
+		background: #10b981;
+		color: white;
+	}
+
+	.status-badge.in-progress {
+		background: #f59e0b;
+		color: white;
+	}
+
+	.status-badge.archived {
+		background: rgb(var(--gray));
+		color: white;
+	}
+
+	/* Dark mode styles */
+	:global(.dark) .project-card {
+		background: rgb(17, 24, 39);
+		border-color: rgb(55, 65, 81);
+	}
+
+	:global(.dark) .project-card.featured {
+		background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+		border-color: var(--accent);
+	}
+
+	:global(.dark) .project-header h3 a {
+		color: rgb(255, 255, 255);
+	}
+
+	:global(.dark) .year {
+		background: rgb(55, 65, 81);
+		color: rgb(209, 213, 219);
+	}
+
+	:global(.dark) .description {
+		color: rgb(209, 213, 219);
+	}
+
+	@media (max-width: 720px) {
+		.projects-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.project-card {
+			padding: 1rem;
+		}
+
+		.project-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+		}
+	}
+</style>

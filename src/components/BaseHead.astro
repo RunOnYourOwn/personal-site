@@ -44,14 +44,11 @@ const { title, description, image = FallbackImage } = Astro.props;
     // Default to dark mode if no preference is saved
     const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark) || (!savedTheme && !prefersDark);
     
-    console.log('Dark mode check:', { savedTheme, prefersDark, shouldBeDark });
     
     if (shouldBeDark) {
       document.documentElement.classList.add('dark');
-      console.log('Dark mode applied');
     } else {
       document.documentElement.classList.remove('dark');
-      console.log('Light mode applied');
     }
   })();
 </script>
