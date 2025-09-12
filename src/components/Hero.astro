@@ -1,0 +1,182 @@
+---
+// Hero component for the landing page
+---
+
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      Hi, I'm <span class="highlight">Aaron Brazier</span>
+    </h1>
+    <p class="hero-subtitle">
+      Full-stack developer, homelab enthusiast, and technology advocate. 
+      I build modern web applications and explore the latest in infrastructure automation.
+    </p>
+    <div class="hero-actions">
+      <a href="/projects" class="btn btn-primary">
+        View My Work
+      </a>
+      <a href="/blog" class="btn btn-secondary">
+        Read My Blog
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-image">
+      <!-- Placeholder for profile image or illustration -->
+      <div class="profile-placeholder">
+        <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="100" fill="currentColor" opacity="0.1"/>
+          <circle cx="100" cy="80" r="30" fill="currentColor" opacity="0.3"/>
+          <path d="M50 160c0-27.6 22.4-50 50-50s50 22.4 50 50" fill="currentColor" opacity="0.3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 80vh;
+    padding: 2rem 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .highlight {
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white !important;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+    color: white !important;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .btn-secondary:hover {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-image {
+    position: relative;
+  }
+
+  .profile-placeholder {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--accent);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Dark mode styles */
+  :global(.dark) .hero-title {
+    color: white;
+  }
+
+  :global(.dark) .hero-subtitle {
+    color: rgb(209, 213, 219);
+  }
+
+  :global(.dark) .profile-placeholder {
+    background: rgb(31, 41, 55);
+    border-color: var(--accent);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      text-align: center;
+      min-height: auto;
+      padding: 2rem 1rem;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+    }
+
+    .hero-actions {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .profile-placeholder {
+      width: 150px;
+      height: 150px;
+    }
+  }
+</style>

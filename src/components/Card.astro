@@ -1,0 +1,51 @@
+---
+// Base Card component for reusable card layouts
+interface Props {
+  class?: string;
+  href?: string;
+}
+
+const { class: className, href, ...props } = Astro.props;
+---
+
+{href ? (
+  <a href={href} class={`card ${className || ''}`} {...props}>
+    <slot />
+  </a>
+) : (
+  <div class={`card ${className || ''}`} {...props}>
+    <slot />
+  </div>
+)}
+
+<style>
+  .card {
+    display: block;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--accent);
+  }
+
+  /* Dark mode styles */
+  :global(.dark) .card {
+    background: rgb(31, 41, 55);
+    border-color: rgb(55, 65, 81);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.dark) .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-color: var(--accent);
+  }
+</style>
