@@ -20,12 +20,7 @@ const { title, description, year, heroImage } = data;
   <div class="project-card-image">
     {
       heroImage ? (
-        <img
-          src={heroImage.src}
-          alt={heroImage.alt || title}
-          loading="lazy"
-          decoding="async"
-        />
+        <img src={heroImage.src} alt={title} loading="lazy" decoding="async" />
       ) : (
         <div class="project-placeholder">
           <svg

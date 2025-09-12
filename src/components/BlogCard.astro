@@ -28,12 +28,7 @@ const formatDate = (date: Date) => {
   <div class="blog-card-image">
     {
       heroImage ? (
-        <img
-          src={heroImage.src}
-          alt={heroImage.alt || title}
-          loading="lazy"
-          decoding="async"
-        />
+        <img src={heroImage.src} alt={title} loading="lazy" decoding="async" />
       ) : (
         <div class="blog-placeholder">
           <svg
