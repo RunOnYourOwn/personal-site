@@ -4,8 +4,13 @@ import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 
 export default defineConfig({
-  site: "https://aaronbrazier.com",
+  site:
+    process.env.SITE_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://aaronbrazier.com"
+      : "http://localhost:8080"),
   base: "/",
+  // trailingSlash: "always",
   integrations: [tailwind(), sitemap(), mdx()],
   markdown: {
     shikiConfig: {

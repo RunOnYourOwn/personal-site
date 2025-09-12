@@ -1,0 +1,23 @@
+# Development Dockerfile for Astro
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+RUN npm install -g npm@latest
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose development port
+EXPOSE 4321
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

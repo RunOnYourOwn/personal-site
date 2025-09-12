@@ -1,0 +1,40 @@
+services:
+  # Production service
+  personal-site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: personal-site
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - proxy
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "swag.enable=true"
+
+  # Development service (optional)
+  personal-site-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: personal-site-dev
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - personal-site-network
+    environment:
+      - NODE_ENV=development
+    profiles:
+      - dev
+
+networks:
+  proxy:
+    external: true
+  personal-site-network:
+    driver: bridge
