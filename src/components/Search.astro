@@ -8,10 +8,13 @@ export interface Props {
     description: string;
     content?: string;
     tags?: string[];
-    type: 'blog' | 'project';
+    type: string;
     slug: string;
     date?: string;
     year?: number;
+    extension?: string;
+    featured?: boolean;
+    status?: string;
   }>;
 }
 
@@ -65,7 +68,9 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
   </div>
 </div>
 
-<script define:vars={{ searchData }}>
+<script is:inline define:vars={{ searchData }}>
+  // Fuse.js will be available on window after script loads
+
   // Load Fuse.js from CDN
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.min.js';
@@ -84,7 +89,7 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
     };
 
     // Initialize Fuse
-    const fuse = new Fuse(searchData, fuseOptions);
+    const fuse = new window.Fuse(searchData, fuseOptions);
     initializeSearch(fuse);
   };
   document.head.appendChild(script);
