@@ -9,6 +9,9 @@ import Header from '../components/Header.astro';
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+
+// Reading time will be calculated in JavaScript from the rendered content
+const readingTime = 5; // Default fallback
 ---
 
 <html lang="en">
@@ -42,12 +45,55 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
         text-align: center;
         line-height: 1;
       }
+      .title-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 0.5em;
+      }
       .title h1 {
-        margin: 0 0 0.5em 0;
+        margin: 0;
+      }
+      .copy-link-btn {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .copy-link-btn:hover {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+      }
+      .copy-link-btn:active {
+        transform: translateY(0);
       }
       .date {
         margin-bottom: 0.5em;
         color: rgb(var(--gray));
+      }
+      .reading-time {
+        color: var(--accent);
+        font-weight: 500;
+        font-size: 0.9em;
+        margin: 0.25em 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+      }
+      .reading-time::before {
+        content: '⏱️';
+        font-size: 0.8em;
       }
       .last-updated-on {
         font-style: italic;
@@ -70,6 +116,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
           <div class="title">
             <div class="date">
               <FormattedDate date={pubDate} />
+              <div class="reading-time">
+                {readingTime} min read
+              </div>
               {
                 updatedDate && (
                   <div class="last-updated-on">
@@ -78,7 +127,26 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
                 )
               }
             </div>
-            <h1>{title}</h1>
+            <div class="title-header">
+              <h1>{title}</h1>
+              <button class="copy-link-btn" title="Copy link to this post">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                  ></path>
+                  <path
+                    d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                  ></path>
+                </svg>
+              </button>
+            </div>
             <hr />
           </div>
           <slot />
@@ -86,5 +154,80 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
       </article>
     </main>
     <Footer />
+
+    <script>
+      // Copy link functionality and reading time calculation
+      document.addEventListener('DOMContentLoaded', function () {
+        // Calculate reading time from the actual content
+        const article = document.querySelector('article');
+        if (article) {
+          const text = article.innerText || article.textContent || '';
+          const words = text
+            .split(/\s+/)
+            .filter(word => word.length > 0).length;
+          const readingTime = Math.ceil(words / 200); // 200 words per minute
+
+          // Update reading time display
+          const readingTimeElement = document.querySelector('.reading-time');
+          if (readingTimeElement) {
+            readingTimeElement.textContent = `${readingTime} min read`;
+          }
+        }
+
+        const copyBtn = document.querySelector(
+          '.copy-link-btn'
+        ) as HTMLButtonElement;
+        if (copyBtn) {
+          copyBtn.addEventListener('click', async function () {
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+
+              // Show success feedback
+              const originalHTML = copyBtn.innerHTML;
+              copyBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+              `;
+              copyBtn.style.background = 'var(--green)';
+              copyBtn.style.borderColor = 'var(--green)';
+
+              // Reset after 2 seconds
+              setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.style.background = '';
+                copyBtn.style.borderColor = '';
+              }, 2000);
+            } catch (err) {
+              console.error('Failed to copy link:', err);
+              // Fallback for older browsers
+              const textArea = document.createElement('textarea');
+              textArea.value = window.location.href;
+              document.body.appendChild(textArea);
+              textArea.select();
+              // @ts-ignore - execCommand is deprecated but still needed for fallback
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+
+              // Show success feedback
+              const originalHTML = copyBtn.innerHTML;
+              copyBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+              `;
+              copyBtn.style.background = 'var(--green)';
+              copyBtn.style.borderColor = 'var(--green)';
+
+              setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.style.background = '';
+                copyBtn.style.borderColor = '';
+              }, 2000);
+            }
+          });
+        }
+      });
+    </script>
   </body>
 </html>

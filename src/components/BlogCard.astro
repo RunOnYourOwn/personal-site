@@ -66,6 +66,28 @@ const formatDate = (date: Date) => {
     day: 'numeric',
   }).format(date);
 };
+
+// Function to calculate reading time
+const calculateReadingTime = (content: string) => {
+  // Remove markdown syntax and count words
+  const text = content
+    .replace(/#{1,6}\s+/g, '') // Remove headers
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+    .replace(/\*(.*?)\*/g, '$1') // Remove italic
+    .replace(/`(.*?)`/g, '$1') // Remove inline code
+    .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '') // Remove images
+    .replace(/\n+/g, ' ') // Replace newlines with spaces
+    .trim();
+
+  const words = text.split(/\s+/).filter(word => word.length > 0).length;
+  const readingTime = Math.ceil(words / 200); // 200 words per minute
+  return readingTime;
+};
+
+// Get reading time from post content
+const readingTime = calculateReadingTime(post.body);
 ---
 
 <Card
@@ -99,9 +121,14 @@ const formatDate = (date: Date) => {
 
   <div class="blog-card-content">
     <div class="blog-card-meta">
-      <time datetime={pubDate.toISOString()}>
-        {formatDate(pubDate)}
-      </time>
+      <div class="blog-card-meta-left">
+        <time datetime={pubDate.toISOString()}>
+          {formatDate(pubDate)}
+        </time>
+        <span class="reading-time">
+          {readingTime} min read
+        </span>
+      </div>
       {
         tags.length > 0 && (
           <div class="blog-card-tags">
@@ -131,6 +158,8 @@ const formatDate = (date: Date) => {
     overflow: hidden;
     position: relative;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    perspective: 1000px;
+    transform-style: preserve-3d;
   }
 
   .blog-card::before {
@@ -159,11 +188,30 @@ const formatDate = (date: Date) => {
   }
 
   .blog-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-12px) scale(1.02) rotateX(3deg) rotateY(1deg);
     box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.1),
-      0 0 0 1px rgba(var(--accent-rgb), 0.2),
-      0 0 20px rgba(var(--accent-rgb), 0.1);
+      0 25px 50px rgba(0, 0, 0, 0.12),
+      0 0 0 1px rgba(var(--accent-rgb), 0.25),
+      0 0 30px rgba(var(--accent-rgb), 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: subtle-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes subtle-glow {
+    0% {
+      box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(var(--accent-rgb), 0.25),
+        0 0 30px rgba(var(--accent-rgb), 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    100% {
+      box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(var(--accent-rgb), 0.3),
+        0 0 35px rgba(var(--accent-rgb), 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
   }
 
   .blog-card.featured {
@@ -171,11 +219,12 @@ const formatDate = (date: Date) => {
   }
 
   .blog-card.featured:hover {
-    transform: translateY(-12px) scale(1.03);
+    transform: translateY(-16px) scale(1.03) rotateX(4deg) rotateY(2deg);
     box-shadow:
-      0 25px 50px rgba(0, 0, 0, 0.15),
+      0 30px 60px rgba(0, 0, 0, 0.18),
       0 0 0 1px rgba(var(--accent-rgb), 0.3),
-      0 0 30px rgba(var(--accent-rgb), 0.2);
+      0 0 40px rgba(var(--accent-rgb), 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .blog-card-image {
@@ -186,10 +235,8 @@ const formatDate = (date: Date) => {
     margin-bottom: 1.25rem;
     position: relative;
     z-index: 2;
-  }
-
-  .blog-card.featured .blog-card-image {
-    height: 300px;
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .blog-card-image img {
@@ -200,9 +247,13 @@ const formatDate = (date: Date) => {
     filter: brightness(1) saturate(1);
   }
 
+  .blog-card:hover .blog-card-image {
+    transform: translateZ(20px) scale(1.02);
+  }
+
   .blog-card:hover .blog-card-image img {
-    transform: scale(1.08) rotate(1deg);
-    filter: brightness(1.1) saturate(1.2);
+    transform: scale(1.05) rotateY(2deg) rotateX(1deg);
+    filter: brightness(1.08) saturate(1.15) contrast(1.05);
   }
 
   .blog-placeholder {
@@ -256,6 +307,12 @@ const formatDate = (date: Date) => {
     flex-grow: 1;
     position: relative;
     z-index: 2;
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .blog-card:hover .blog-card-content {
+    transform: translateZ(10px);
   }
 
   .blog-card-meta {
@@ -265,11 +322,35 @@ const formatDate = (date: Date) => {
     margin-bottom: 1rem;
     font-size: 0.875rem;
     color: var(--text-secondary);
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .blog-card-meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .reading-time {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .reading-time::before {
+    content: '⏱️';
+    font-size: 0.7rem;
   }
 
   .blog-card:hover .blog-card-meta {
     color: var(--accent);
+    transform: translateY(-2px);
+    transition-delay: 0.1s;
   }
 
   .blog-card-tags {
@@ -369,16 +450,13 @@ const formatDate = (date: Date) => {
     line-height: 1.3;
     transition: all 0.3s ease;
     position: relative;
-  }
-
-  .blog-card.featured .blog-card-title {
-    font-size: 1.75rem;
-    font-weight: 800;
+    transform: translateY(0);
   }
 
   .blog-card:hover .blog-card-title {
     color: var(--accent);
-    transform: translateX(4px);
+    transform: translateX(4px) translateY(-2px);
+    transition-delay: 0.2s;
   }
 
   .blog-card-description {
@@ -386,11 +464,14 @@ const formatDate = (date: Date) => {
     line-height: 1.6;
     margin: 0 0 1.5rem 0;
     flex-grow: 1;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    transform: translateY(0);
   }
 
   .blog-card:hover .blog-card-description {
     color: var(--text-primary);
+    transform: translateY(-1px);
+    transition-delay: 0.3s;
   }
 
   .blog-card-footer {
@@ -492,14 +573,6 @@ const formatDate = (date: Date) => {
       grid-column: span 1;
     }
 
-    .blog-card.featured .blog-card-image {
-      height: 200px;
-    }
-
-    .blog-card.featured .blog-card-title {
-      font-size: 1.25rem;
-    }
-
     .blog-card-meta {
       flex-direction: column;
       align-items: flex-start;
@@ -516,6 +589,54 @@ const formatDate = (date: Date) => {
   }
 
   @media (max-width: 480px) {
+    .blog-card {
+      margin-bottom: 1rem;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .blog-card-content {
+      padding: 1rem;
+    }
+
+    .blog-card-meta {
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-card-meta-left {
+      gap: 0.2rem;
+    }
+
+    .blog-card-title {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .blog-card-description {
+      font-size: 1rem;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+
+    .blog-card-footer {
+      margin-top: auto;
+    }
+
+    .blog-card-link {
+      font-size: 1rem;
+      padding: 0.5rem 0;
+    }
+
+    .blog-card-tags {
+      gap: 0.5rem;
+    }
+
+    .tag {
+      font-size: 0.8rem;
+      padding: 0.375rem 0.75rem;
+    }
+
     .blog-card:hover {
       transform: translateY(-2px) scale(1.005);
     }
