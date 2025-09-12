@@ -25,40 +25,18 @@
     const toggle = document.getElementById('dark-mode-toggle');
     const html = document.documentElement;
     
-    // Check current state (already set by BaseHead script)
-    const isDark = html.classList.contains('dark');
-    
-    // Update toggle button state
-    updateToggleIcon(isDark);
-    
     // Toggle function
     toggle.addEventListener('click', () => {
       const isCurrentlyDark = html.classList.contains('dark');
       
-      
       if (isCurrentlyDark) {
         html.classList.remove('dark');
         localStorage.setItem('theme', 'light');
-        updateToggleIcon(false);
       } else {
         html.classList.add('dark');
         localStorage.setItem('theme', 'dark');
-        updateToggleIcon(true);
       }
     });
-  }
-  
-  function updateToggleIcon(isDark) {
-    const sunIcon = document.querySelector('.sun-icon');
-    const moonIcon = document.querySelector('.moon-icon');
-    
-    if (isDark) {
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
-    } else {
-      sunIcon.style.display = 'block';
-      moonIcon.style.display = 'none';
-    }
   }
   
   // Initialize when DOM is ready
@@ -98,8 +76,18 @@
     transition: opacity 0.2s ease;
   }
   
+  /* Default state - show sun icon (light mode) */
   .moon-icon {
     display: none;
+  }
+  
+  /* Dark mode state - show moon icon */
+  :global(.dark) .sun-icon {
+    display: none;
+  }
+  
+  :global(.dark) .moon-icon {
+    display: block;
   }
   
   @media (max-width: 720px) {
