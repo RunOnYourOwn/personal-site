@@ -1,76 +1,402 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
-import Layout from '../layouts/BlogPost.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<Layout
-  title="About Me"
-  description="Lorem ipsum dolor sit amet"
-  pubDate={new Date('August 08 2021')}
-  heroImage={AboutHeroImage}
-  tags={[]}
-  draft={false}
-  featured={false}
+<BaseLayout
+  title="About Me - Aaron Brazier"
+  description="Senior Data Scientist with extensive experience in machine learning, Python development, and homelab infrastructure automation."
 >
-  <p>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo
-    integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis
-    egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In
-    hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat.
-    Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu
-    non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim.
-    Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed
-    vulputate mi. Dictumst quisque sagittis purus sit amet.
-  </p>
+  <div class="about-container">
+    <div class="about-hero">
+      <div class="about-badge">
+        <span class="badge-icon">👨‍💻</span>
+        <span class="badge-text">Senior Data Scientist</span>
+      </div>
+      <h1 class="about-title">About Aaron Brazier</h1>
+      <p class="about-subtitle">
+        Data Science & Machine Learning Engineer with a passion for
+        infrastructure automation and continuous learning.
+      </p>
+    </div>
 
-  <p>
-    Morbi tristique senectus et netus. Id semper risus in hendrerit gravida
-    rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus
-    sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris
-    rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus
-    dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-    massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius
-    morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras
-    ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est
-    ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa
-    ultricies mi.
-  </p>
+    <div class="about-content">
+      <section class="about-section">
+        <h2>Professional Background</h2>
+        <p>
+          As a Senior Data Scientist with extensive experience in the oil and
+          gas industry, I am highly proficient in Python and experienced in
+          working with PyTorch, scikit-learn, Matplotlib, and Pandas to develop
+          sophisticated machine learning models and pipelines. Additionally, I
+          have working knowledge of TensorFlow and common machine learning
+          algorithms.
+        </p>
+        <p>
+          I am driven to further expand my skills and knowledge and tackle even
+          more complex challenges. I am eager to learn new techniques and
+          technologies that can help me uncover deeper insights and drive more
+          impactful business decisions.
+        </p>
+        <p>
+          As I continue on my journey as a data scientist, I am committed to
+          lifelong learning and professional development. I am excited to take
+          on new challenges and explore new opportunities to drive innovation
+          and value in the oil and gas industry and beyond.
+        </p>
+      </section>
 
-  <p>
-    Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque.
-    Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac
-    felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit
-    amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed
-    elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-    dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra.
-    Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum
-    consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus
-    ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-    facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed
-    risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor
-    vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus
-    non. Amet dictum sit amet justo donec enim.
-  </p>
+      <section class="about-section">
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h3>Python/ML Libraries</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">PyTorch</span>
+              <span class="skill-tag">Scikit-Learn</span>
+              <span class="skill-tag">TensorFlow</span>
+              <span class="skill-tag">Matplotlib</span>
+              <span class="skill-tag">Pandas</span>
+              <span class="skill-tag">Keras</span>
+            </div>
+          </div>
 
-  <p>
-    Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac
-    ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem
-    viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu
-    ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac
-    tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-    pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim
-    sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam.
-    Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
-  </p>
+          <div class="skill-category">
+            <h3>Machine Learning</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">Classification</span>
+              <span class="skill-tag">Time Series</span>
+              <span class="skill-tag">Feature Engineering</span>
+              <span class="skill-tag">Hyperparameter Tuning</span>
+              <span class="skill-tag">Random Forest</span>
+              <span class="skill-tag">Gradient Boosting</span>
+              <span class="skill-tag">Neural Networks</span>
+            </div>
+          </div>
 
-  <p>
-    Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus
-    imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu
-    cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum.
-    Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit
-    libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed
-    pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique
-    magna.
-  </p>
-</Layout>
+          <div class="skill-category">
+            <h3>Programming & Databases</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">Python (Pandas, NumPy, SciPy)</span>
+              <span class="skill-tag">SQL (Spark, PostgreSQL)</span>
+              <span class="skill-tag">InfluxDB</span>
+              <span class="skill-tag">MariaDB</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <h3>Cloud & DevOps</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">Microsoft Azure</span>
+              <span class="skill-tag">Git/GitHub</span>
+              <span class="skill-tag">Docker</span>
+              <span class="skill-tag">Podman</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2>Homelab & Personal Projects</h2>
+        <p>
+          In my free time I enjoy learning and deploying new technologies in my
+          home lab. Currently I have deployed multiple database infrastructures,
+          a full home automation suite (home assistant, ZigBee, MQTT, etc.),
+          Proxmox cluster, different NAS technologies, version control, Grafana
+          for monitoring the systems and network, a raspberry pi Kubernetes
+          cluster, and also provide a 3-2-1 backup solution for all services.
+        </p>
+        <div class="homelab-tech">
+          <div class="tech-item">
+            <span class="tech-icon">🏠</span>
+            <span class="tech-name">Home Automation</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-icon">🐳</span>
+            <span class="tech-name">Docker & Kubernetes</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-icon">📊</span>
+            <span class="tech-name">Grafana Monitoring</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-icon">💾</span>
+            <span class="tech-name">3-2-1 Backup Strategy</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2>Certifications</h2>
+        <div class="certifications">
+          <div class="cert-category">
+            <h3>Data Science</h3>
+            <ul>
+              <li>
+                Data Science Bootcamps (Pragmatic Institute): Intermediate
+                (March 2022), Beginner (June 2021)
+              </li>
+            </ul>
+          </div>
+          <div class="cert-category">
+            <h3>CompTIA</h3>
+            <ul>
+              <li>A+, Network+, Security+, Project+, Linux+</li>
+            </ul>
+          </div>
+          <div class="cert-category">
+            <h3>Professional</h3>
+            <ul>
+              <li>Project Management Professional (PMP)</li>
+              <li>LPIC-1: Linux System Administrator</li>
+              <li>MCSA: Windows 7</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .about-hero {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 2rem 0;
+  }
+
+  .about-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .badge-icon {
+    font-size: 1.25rem;
+  }
+
+  .badge-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .about-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--accent), #00ff88);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .about-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .about-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+  }
+
+  .about-section p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+
+  .skill-category {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .skill-category:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
+  }
+
+  .skill-category h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .skill-tag {
+    background: rgba(var(--accent-rgb), 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .skill-tag:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .homelab-tech {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .tech-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(var(--accent-rgb), 0.05);
+    border: 1px solid rgba(var(--accent-rgb), 0.1);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+  }
+
+  .tech-item:hover {
+    background: rgba(var(--accent-rgb), 0.1);
+    border-color: rgba(var(--accent-rgb), 0.3);
+    transform: translateY(-2px);
+  }
+
+  .tech-icon {
+    font-size: 1.5rem;
+  }
+
+  .tech-name {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .certifications {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+
+  .cert-category {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+
+  .cert-category h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--accent);
+  }
+
+  .cert-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .cert-category li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cert-category li:last-child {
+    border-bottom: none;
+  }
+
+  /* Dark mode styles */
+  :global(.dark) .about-title {
+    color: white;
+  }
+
+  :global(.dark) .about-section h2 {
+    color: white;
+  }
+
+  :global(.dark) .skill-category {
+    background: rgb(31, 41, 55);
+    border-color: rgb(55, 65, 81);
+  }
+
+  :global(.dark) .skill-category h3 {
+    color: white;
+  }
+
+  :global(.dark) .cert-category {
+    background: rgb(31, 41, 55);
+    border-color: rgb(55, 65, 81);
+  }
+
+  :global(.dark) .tech-name {
+    color: white;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .about-title {
+      font-size: 2.5rem;
+    }
+
+    .skills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .homelab-tech {
+      grid-template-columns: 1fr;
+    }
+
+    .certifications {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

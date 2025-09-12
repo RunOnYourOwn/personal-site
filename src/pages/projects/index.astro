@@ -4,6 +4,8 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
+import Search from '../../components/Search.astro';
+import { generateSearchData } from '../../scripts/generate-search-data.js';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
 const projects = await getCollection('projects');
@@ -20,6 +22,9 @@ otherProjects.sort(sortByYear);
 
 // Combine all projects for the main list (just like blog page)
 const allProjects = [...featuredProjects, ...otherProjects];
+
+// Generate search data
+const searchData = await generateSearchData();
 ---
 
 <!doctype html>
@@ -32,6 +37,10 @@ const allProjects = [...featuredProjects, ...otherProjects];
     <style>
       main {
         width: 960px;
+      }
+      .search-section {
+        margin-bottom: 2rem;
+        padding: 1rem 0;
       }
       ul {
         display: flex;
@@ -113,6 +122,12 @@ const allProjects = [...featuredProjects, ...otherProjects];
   <body>
     <Header />
     <main>
+      <section class="search-section">
+        <Search
+          placeholder="Search projects and blog posts..."
+          searchData={searchData.all}
+        />
+      </section>
       <section>
         <ul>
           {
