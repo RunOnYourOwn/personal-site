@@ -7,6 +7,8 @@
 :root {
   --accent: #2337ff;
   --accent-dark: #000d8a;
+  --accent-light: #e0e7ff;
+  --accent-rgb: 35, 55, 255;
   --black: 15, 18, 25;
   --gray: 96, 115, 159;
   --gray-light: 229, 233, 240;
@@ -15,12 +17,23 @@
   --box-shadow:
     0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
     0 16px 32px rgba(var(--gray), 33%);
+
+  /* Component variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: rgb(var(--black));
+  --text-secondary: rgb(var(--gray-dark));
+  --border: rgb(var(--gray-light));
+  --border-color: rgb(var(--gray-light));
+  --box-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Dark mode variables */
 .dark {
   --accent: #3b82f6;
   --accent-dark: #1e40af;
+  --accent-light: rgba(59, 130, 246, 0.2);
+  --accent-rgb: 59, 130, 246;
   --black: 255, 255, 255;
   --gray: 156, 163, 175;
   --gray-light: 55, 65, 81;
@@ -29,6 +42,15 @@
   --box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4),
     0 16px 32px rgba(0, 0, 0, 0.4);
+
+  /* Component variables */
+  --bg-primary: rgb(31, 41, 55);
+  --bg-secondary: rgb(17, 24, 39);
+  --text-primary: rgb(var(--black));
+  --text-secondary: rgb(var(--gray));
+  --border: rgb(var(--gray-light));
+  --border-color: rgb(var(--gray-light));
+  --box-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Force dark mode styles */

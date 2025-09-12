@@ -3,40 +3,92 @@
 ---
 
 <section class="hero">
+  <!-- Floating background elements -->
+  <div class="hero-bg">
+    <div class="floating-element element-1"></div>
+    <div class="floating-element element-2"></div>
+    <div class="floating-element element-3"></div>
+    <div class="floating-element element-4"></div>
+    <div class="floating-element element-5"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
   <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-text">Senior Data Scientist</span>
+      <div class="badge-pulse"></div>
+    </div>
+
     <h1 class="hero-title">
-      Hi, I'm <span class="highlight">Aaron Brazier</span>
+      <span class="title-line">Hi, I'm</span>
+      <span class="title-line highlight">Aaron Brazier</span>
     </h1>
+
     <p class="hero-subtitle">
-      Full-stack developer, homelab enthusiast, and technology advocate. I build
-      modern web applications and explore the latest in infrastructure
-      automation.
+      <span class="subtitle-line">Data Science & Machine Learning Engineer</span
+      >
+      <span class="subtitle-line"
+        >Homelab Enthusiast & Infrastructure Automation</span
+      >
     </p>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number">8+</span>
+        <span class="stat-label">Years Experience</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">15+</span>
+        <span class="stat-label">Certifications</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">∞</span>
+        <span class="stat-label">Learning</span>
+      </div>
+    </div>
+
     <div class="hero-actions">
-      <a href="/projects" class="btn btn-primary"> View My Work </a>
-      <a href="/blog" class="btn btn-secondary"> Read My Blog </a>
+      <a href="/projects" class="btn btn-primary">
+        <span class="btn-text">View My Work</span>
+      </a>
+      <a href="/blog" class="btn btn-secondary">
+        <span class="btn-text">Read My Blog</span>
+      </a>
     </div>
   </div>
+
   <div class="hero-visual">
-    <div class="hero-image">
-      <!-- Placeholder for profile image or illustration -->
-      <div class="profile-placeholder">
-        <svg
-          width="200"
-          height="200"
-          viewBox="0 0 200 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle cx="100" cy="100" r="100" fill="currentColor" opacity="0.1"
-          ></circle>
-          <circle cx="100" cy="80" r="30" fill="currentColor" opacity="0.3"
-          ></circle>
-          <path
-            d="M50 160c0-27.6 22.4-50 50-50s50 22.4 50 50"
-            fill="currentColor"
-            opacity="0.3"></path>
-        </svg>
+    <div class="cyber-terminal">
+      <div class="terminal-header">
+        <div class="terminal-buttons">
+          <span class="btn-close"></span>
+          <span class="btn-minimize"></span>
+          <span class="btn-maximize"></span>
+        </div>
+        <div class="terminal-title">aaron@terminal:~$</div>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">whoami</span>
+        </div>
+        <div class="terminal-line output">
+          <span class="output-text">Senior Data Scientist</span>
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat skills.txt</span>
+        </div>
+        <div class="terminal-line output">
+          <span class="output-text"
+            >Python • PyTorch • TensorFlow • Azure • Docker</span
+          >
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command typing">ls homelab/</span>
+          <span class="cursor">_</span>
+        </div>
       </div>
     </div>
   </div>
@@ -44,35 +96,215 @@
 
 <style>
   .hero {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    gap: 3rem;
     align-items: center;
     min-height: 80vh;
-    padding: 2rem 0;
+    padding: 1rem 0;
     max-width: 1200px;
     margin: 0 auto;
+    overflow: hidden;
+  }
+
+  /* Floating background elements */
+  .hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--accent), var(--accent-light));
+    opacity: 0.1;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .element-1 {
+    width: 80px;
+    height: 80px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .element-2 {
+    width: 120px;
+    height: 120px;
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
+  }
+
+  .element-3 {
+    width: 60px;
+    height: 60px;
+    top: 30%;
+    right: 30%;
+    animation-delay: 4s;
+  }
+
+  .element-4 {
+    width: 100px;
+    height: 100px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 1s;
+  }
+
+  .element-5 {
+    width: 40px;
+    height: 40px;
+    top: 80%;
+    right: 40%;
+    animation-delay: 3s;
+  }
+
+  .grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      linear-gradient(rgba(var(--accent-rgb), 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--accent-rgb), 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
+  }
+
+  @keyframes gridMove {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(50px, 50px);
+    }
   }
 
   .hero-content {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
   }
 
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    width: fit-content;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .badge-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-pulse {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--accent-rgb), 0.3),
+      transparent
+    );
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      left: -100%;
+    }
+    50% {
+      left: 100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
   .hero-title {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: 4rem;
+    font-weight: 800;
     line-height: 1.1;
     margin: 0;
     color: var(--text-primary);
   }
 
+  .title-line {
+    display: block;
+    animation: slideInUp 0.8s ease-out;
+  }
+
+  .title-line:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
   .highlight {
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    background: linear-gradient(
+      135deg,
+      var(--accent),
+      #00ff88,
+      var(--accent-light)
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease-in-out infinite;
+  }
+
+  @keyframes gradientShift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .hero-subtitle {
@@ -82,33 +314,99 @@
     margin: 0;
   }
 
+  .subtitle-line {
+    display: block;
+    animation: slideInUp 0.8s ease-out;
+    animation-delay: 0.4s;
+    animation-fill-mode: both;
+  }
+
+  .subtitle-line:nth-child(2) {
+    animation-delay: 0.6s;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0.5rem 0;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(var(--accent-rgb), 0.05);
+    border: 1px solid rgba(var(--accent-rgb), 0.1);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    animation: slideInUp 0.8s ease-out;
+    animation-delay: 0.8s;
+    animation-fill-mode: both;
+  }
+
+  .stat-item:hover {
+    transform: translateY(-5px);
+    background: rgba(var(--accent-rgb), 0.1);
+    border-color: rgba(var(--accent-rgb), 0.3);
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+
   .hero-actions {
     display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
   }
 
   .btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
+    justify-content: center;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
     text-decoration: none;
     font-weight: 600;
-    transition: all 0.2s ease;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
+    overflow: hidden;
+    animation: slideInUp 0.8s ease-out;
+    animation-delay: 1s;
+    animation-fill-mode: both;
+  }
+
+  .btn-text {
+    position: relative;
+    z-index: 2;
+    color: inherit;
+    transition: color 0.3s ease;
   }
 
   .btn-primary {
-    background: var(--accent);
-    color: white !important;
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
   }
 
   .btn-primary:hover {
-    background: var(--accent-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+    background: var(--accent);
     color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--accent-rgb), 0.3);
   }
 
   .btn-secondary {
@@ -119,30 +417,121 @@
 
   .btn-secondary:hover {
     background: var(--accent);
-    color: white;
-    transform: translateY(-2px);
+    color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--accent-rgb), 0.3);
   }
 
   .hero-visual {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .hero-image {
     position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  .profile-placeholder {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: var(--bg-secondary);
+  .cyber-terminal {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    animation: slideInUp 0.8s ease-out;
+    animation-delay: 1.2s;
+    animation-fill-mode: both;
+  }
+
+  .terminal-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    border: 4px solid var(--accent);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(var(--accent-rgb), 0.1);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.2);
+  }
+
+  .terminal-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-close,
+  .btn-minimize,
+  .btn-maximize {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .btn-close {
+    background: #ff5f57;
+  }
+  .btn-minimize {
+    background: #ffbd2e;
+  }
+  .btn-maximize {
+    background: #28ca42;
+  }
+
+  .terminal-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .terminal-body {
+    padding: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .terminal-line {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .prompt {
+    color: #00ff88;
+    font-weight: 600;
+  }
+
+  .command {
+    color: #ffffff;
+  }
+
+  .output {
+    margin-left: 1rem;
+  }
+
+  .output-text {
+    color: #888;
+  }
+
+  .typing {
+    color: #ffffff;
+  }
+
+  .cursor {
+    color: #00ff88;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
   }
 
   /* Dark mode styles */
@@ -154,9 +543,24 @@
     color: rgb(209, 213, 219);
   }
 
-  :global(.dark) .profile-placeholder {
-    background: rgb(31, 41, 55);
+  :global(.dark) .cyber-terminal {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(var(--accent-rgb), 0.5);
+  }
+
+  :global(.dark) .btn-primary,
+  :global(.dark) .btn-secondary {
+    color: var(--accent);
     border-color: var(--accent);
+  }
+
+  :global(.dark) .btn-primary:hover,
+  :global(.dark) .btn-secondary:hover {
+    color: white !important;
+  }
+
+  :global(.dark) .btn-text {
+    color: inherit;
   }
 
   /* Responsive design */
@@ -177,14 +581,19 @@
       font-size: 1.125rem;
     }
 
+    .hero-stats {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
     .hero-actions {
       justify-content: center;
       flex-wrap: wrap;
     }
 
-    .profile-placeholder {
-      width: 150px;
-      height: 150px;
+    .cyber-terminal {
+      max-width: 100%;
     }
   }
 </style>
