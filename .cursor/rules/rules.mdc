@@ -1,0 +1,189 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Cursor Rules for Aaron Brazier Personal Website
+
+## Project Overview
+
+This is a modern, blazing-fast personal website built with Astro, deployed via Docker to a homelab with SWAG routing. The site serves as a portfolio, blog, and project showcase for Aaron Brazier.
+
+**Tech Stack:**
+
+- **Framework:** Astro + MDX (Markdown-first, zero-JS by default, React "islands" where needed)
+- **UI/Styling:** Tailwind CSS, CSS variables for theme, Heroicons/Lucide, subtle Motion (React island with framer-motion only where needed)
+- **Fonts:** Inter (UI) + JetBrains Mono (code), loaded locally for speed
+- **Content:** Astro Content Collections (Zod schemas) for `/blog` and `/projects`
+- **SEO:** canonical, OpenGraph/Twitter tags, JSON-LD; `@astrojs/sitemap`, `robots.txt`
+- **Feeds/Search:** `@astrojs/rss`, tiny client-side search with Fuse.js
+- **Analytics:** Plausible/Umami (privacy-friendly; optional)
+- **Deployment:** Docker → GHCR → Portainer → SWAG on `aaronbrazier.com`
+
+## Development Guidelines
+
+### Code Style & Quality
+
+- Use TypeScript strict mode
+- Follow Astro best practices (zero-JS by default, React islands only when needed)
+- Use Tailwind CSS for styling with CSS variables for theming
+- Implement proper TypeScript types for all content collections
+- Use Zod schemas for content validation
+- Follow semantic HTML and accessibility best practices
+
+### File Structure
+
+```
+/ (repo root)
+  astro.config.mjs
+  package.json / package-lock.json
+  tailwind.config.js / postcss.config.js
+  public/                       # static assets (favicons, og images)
+  src/
+    components/                 # Navbar, Hero, Cards, Footer, etc.
+    content/
+      config.ts                 # collections + Zod schemas
+      blog/                     # *.mdx posts
+      projects/                 # *.md or *.mdx project entries
+    layouts/                    # PostLayout, PageLayout
+    pages/
+      index.astro               # landing (portfolio)
+      blog/index.astro
+      blog/[slug].astro
+      projects/index.astro
+      projects/[slug].astro
+      about.astro
+      404.astro
+  Dockerfile                    # multi-stage (Astro → Nginx)
+  nginx.conf                    # cache + security headers
+  .github/workflows/ci.yml      # Actions: build → GHCR → Portainer webhook
+```
+
+### Content Collections
+
+- Use Zod schemas for type safety
+- Blog posts: title, description, date, tags, hero image, draft status
+- Projects: title, description, links, repo, year, tags, featured status
+- All content should be in Markdown/MDX format
+- Use proper frontmatter for all content
+
+### Performance & SEO
+
+- Optimize images with Astro's built-in image optimization
+- Implement proper meta tags and OpenGraph data
+- Use semantic HTML and proper heading hierarchy
+- Ensure mobile responsiveness
+- Implement dark mode with system preference detection
+- Add proper caching headers in nginx configuration
+
+### Deployment & CI/CD
+
+- Use GitHub Actions for automated builds
+- Push Docker images to GHCR (GitHub Container Registry)
+- Use Portainer webhooks for automatic deployment
+- Configure SWAG for SSL termination and routing
+- Implement health checks for monitoring
+
+## Specific Rules
+
+### Astro Components
+
+- Prefer `.astro` files over React components
+- Use React islands only for interactive features (search, animations)
+- Keep components small and focused
+- Use proper TypeScript interfaces for props
+- Implement proper error boundaries
+
+### Styling
+
+- Use Tailwind CSS utility classes
+- Implement CSS variables for theme colors
+- Use Inter font for UI text, JetBrains Mono for code
+- Implement proper focus states and accessibility
+- Use subtle animations with framer-motion (React island)
+
+### Content Management
+
+- All blog posts go in `src/content/blog/`
+- All projects go in `src/content/projects/`
+- Use proper frontmatter with Zod validation
+- Implement draft status for unpublished content
+- Use consistent naming conventions for files
+
+### Docker & Deployment
+
+- Use multi-stage Docker builds for optimization
+- Implement proper nginx configuration with caching
+- Add security headers
+- Use health checks for monitoring
+- Keep images small and secure
+
+### Git & Version Control
+
+- Use conventional commit messages
+- Implement pre-commit hooks with linting and formatting
+- Keep commits atomic and focused
+- Use proper branch naming conventions
+
+## Development Commands
+
+```bash
+# Development
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Lint and format
+npm run lint
+npm run format
+
+# Type checking
+npm run astro check
+```
+
+## Deployment Process
+
+1. Push changes to `main` branch
+2. GitHub Actions automatically builds and pushes to GHCR
+3. Portainer webhook triggers automatic deployment
+4. SWAG routes traffic to the new container
+5. Site is live at `aaronbrazier.com`
+
+## Content Guidelines
+
+- Write in a professional but approachable tone
+- Use proper markdown formatting
+- Include relevant tags for blog posts and projects
+- Add hero images for featured content
+- Keep descriptions concise but informative
+- Use proper heading hierarchy
+
+## Security Considerations
+
+- Use proper CSP headers
+- Implement XSS protection
+- Use secure nginx configuration
+- Keep dependencies updated
+- Use proper authentication for deployment
+
+## Monitoring & Maintenance
+
+- Monitor site uptime with health checks
+- Track performance metrics
+- Keep dependencies updated
+- Regular content updates
+- Monitor security advisories
+
+## Contact & Support
+
+- Repository: `runonyourown/personal-site`
+- Domain: `aaronbrazier.com`
+- Deployment: Homelab with SWAG + Portainer
+- CI/CD: GitHub Actions → GHCR → Portainer webhook
+
+Remember: This is a personal website that should showcase Aaron's skills, projects, and thoughts. Keep it professional, performant, and maintainable.
