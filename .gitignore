@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 IMPLEMENTATION_PLAN.md
 CONTENT_GUIDE.md
+test-production-domain.sh

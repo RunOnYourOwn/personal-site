@@ -13,8 +13,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Set production environment
+# Set production environment and site URL
 ENV NODE_ENV=production
+ARG SITE_URL=https://aaronbrazier.com
+ENV SITE_URL=${SITE_URL}
 
 # Build the site
 RUN npm run build
