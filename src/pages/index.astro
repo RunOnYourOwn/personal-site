@@ -25,170 +25,262 @@ const featuredProjects = allProjects
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <Hero />
 
-  <section class="section">
-    <div class="section-header">
-      <h2>Featured Projects</h2>
-      <p>Some of my recent work and side projects</p>
-    </div>
+  <main class="main-content">
+    <section class="section">
+      <div class="section-header scroll-animate" style="animation-delay: 0s">
+        <h2>Featured Projects</h2>
+        <p>Some of my recent work and side projects</p>
+      </div>
 
-    {
-      featuredProjects.length > 0 ? (
-        <div class="projects-grid">
-          {featuredProjects.map((project, index) => (
-            <ProjectCard project={project} featured={index === 0} />
-          ))}
-        </div>
-      ) : (
-        <div class="empty-state">
-          <p>No featured projects yet. Check back soon!</p>
-          <a href="/projects" class="btn btn-primary">
-            View All Projects
-          </a>
-        </div>
-      )
+      {
+        featuredProjects.length > 0 ? (
+          <div class="projects-grid">
+            {featuredProjects.map((project, index) => (
+              <div
+                class="scroll-animate"
+                style={`animation-delay: ${(index + 1) * 0.1}s`}
+              >
+                <ProjectCard project={project} featured={index === 0} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state scroll-animate" style="animation-delay: 0.1s">
+            <p>No featured projects yet. Check back soon!</p>
+            <a href="/projects" class="btn btn-primary">
+              View All Projects
+            </a>
+          </div>
+        )
+      }
+
+      <div
+        class="section-footer scroll-animate"
+        style={`animation-delay: ${(featuredProjects.length + 1) * 0.1}s`}
+      >
+        <a href="/projects" class="btn btn-secondary">View All Projects</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header scroll-animate" style="animation-delay: 0s">
+        <h2>Latest Blog Posts</h2>
+        <p>Thoughts on development, technology, and more</p>
+      </div>
+
+      {
+        latestPosts.length > 0 ? (
+          <div class="blog-grid">
+            {latestPosts.map((post, index) => (
+              <div
+                class="scroll-animate"
+                style={`animation-delay: ${(index + 1) * 0.1}s`}
+              >
+                <BlogCard post={post} featured={index === 0} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state scroll-animate" style="animation-delay: 0.1s">
+            <p>No blog posts yet. Check back soon!</p>
+            <a href="/blog" class="btn btn-primary">
+              View All Posts
+            </a>
+          </div>
+        )
+      }
+
+      <div
+        class="section-footer scroll-animate"
+        style={`animation-delay: ${(latestPosts.length + 1) * 0.1}s`}
+      >
+        <a href="/blog" class="btn btn-secondary">View All Posts</a>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    <div class="section-footer">
-      <a href="/projects" class="btn btn-secondary">View All Projects</a>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <h2>Latest Blog Posts</h2>
-      <p>Thoughts on development, technology, and more</p>
-    </div>
-
-    {
-      latestPosts.length > 0 ? (
-        <div class="blog-grid">
-          {latestPosts.map((post, index) => (
-            <BlogCard post={post} featured={index === 0} />
-          ))}
-        </div>
-      ) : (
-        <div class="empty-state">
-          <p>No blog posts yet. Check back soon!</p>
-          <a href="/blog" class="btn btn-primary">
-            View All Posts
-          </a>
-        </div>
-      )
-    }
-
-    <div class="section-footer">
-      <a href="/blog" class="btn btn-secondary">View All Posts</a>
-    </div>
-  </section>
-</BaseLayout>
-
-<style>
-  .section {
-    margin: 2.5rem 0;
-  }
-
-  .section-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .section-header h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0 0 1rem 0;
-    color: var(--text-primary);
-  }
-
-  .section-header p {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    margin: 0;
-  }
-
-  .projects-grid,
-  .blog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-footer {
-    text-align: center;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-secondary);
-  }
-
-  .empty-state p {
-    font-size: 1.125rem;
-    margin: 0 0 1.5rem 0;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    border: 2px solid transparent;
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background: var(--accent-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--accent);
-    border-color: var(--accent);
-  }
-
-  .btn-secondary:hover {
-    background: var(--accent);
-    color: white;
-    transform: translateY(-2px);
-  }
-
-  /* Dark mode styles */
-  :global(.dark) .section-header h2 {
-    color: white;
-  }
-
-  :global(.dark) .section-header p {
-    color: rgb(209, 213, 219);
-  }
-
-  :global(.dark) .empty-state {
-    color: rgb(156, 163, 175);
-  }
-
-  /* Responsive design */
-  @media (max-width: 768px) {
     .section {
-      margin: 2rem 0;
+      margin: 2.5rem 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 2rem;
     }
 
     .section-header h2 {
-      font-size: 2rem;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 1rem 0;
+      color: var(--text-primary);
+    }
+
+    .section-header p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      margin: 0;
     }
 
     .projects-grid,
     .blog-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
     }
-  }
-</style>
+
+    .section-footer {
+      text-align: center;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state p {
+      font-size: 1.125rem;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Dark mode styles */
+    :global(.dark) .section-header h2 {
+      color: white;
+    }
+
+    :global(.dark) .section-header p {
+      color: rgb(209, 213, 219);
+    }
+
+    :global(.dark) .empty-state {
+      color: rgb(156, 163, 175);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 0 1rem;
+      }
+
+      .section {
+        margin: 2rem 0;
+      }
+
+      .section-header h2 {
+        font-size: 2rem;
+      }
+
+      .projects-grid,
+      .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  </style>
+
+  <script>
+    // Initialize scroll animations for homepage
+    function initHomepageScrollAnimations() {
+      console.log('Homepage: Initializing scroll animations');
+
+      // First, ensure all elements start hidden
+      const elements = document.querySelectorAll('.scroll-animate');
+      console.log('Homepage: Found scroll-animate elements:', elements.length);
+
+      elements.forEach(element => {
+        // Remove any existing animate-in class and ensure element is hidden
+        element.classList.remove('animate-in');
+        console.log('Homepage: Reset element:', element);
+      });
+
+      if (!('IntersectionObserver' in window)) {
+        console.log(
+          'No IntersectionObserver, showing elements immediately:',
+          elements.length
+        );
+        elements.forEach(element => {
+          element.classList.add('animate-in');
+        });
+        return;
+      }
+
+      // Wait a moment before starting observations to ensure elements are properly hidden
+      setTimeout(() => {
+        const observer = new IntersectionObserver(
+          entries => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                console.log('Homepage: Element animating in:', entry.target);
+                entry.target.classList.add('animate-in');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px',
+          }
+        );
+
+        elements.forEach(element => {
+          console.log('Homepage: Observing element:', element);
+          observer.observe(element);
+        });
+      }, 100);
+    }
+
+    // Initialize when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener(
+        'DOMContentLoaded',
+        initHomepageScrollAnimations
+      );
+    } else {
+      initHomepageScrollAnimations();
+    }
+  </script>
+</BaseLayout>

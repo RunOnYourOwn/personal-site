@@ -1,10 +1,10 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 import Search from '../../components/Search.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
 import { generateSearchData } from '../../scripts/generate-search-data.js';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
@@ -25,6 +25,11 @@ const allProjects = [...featuredProjects, ...otherProjects];
 
 // Generate search data
 const searchData = await generateSearchData();
+
+// Get all unique tags for filtering
+const allTags = [
+  ...new Set(projects.flatMap(project => project.data.tags || [])),
+];
 ---
 
 <!doctype html>
@@ -34,140 +39,524 @@ const searchData = await generateSearchData();
       title={`Projects - ${SITE_TITLE}`}
       description={SITE_DESCRIPTION}
     />
-    <style>
-      main {
-        width: 960px;
-      }
-      .search-section {
-        margin-bottom: 2rem;
-        padding: 1rem 0;
-      }
-      ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      ul li {
-        width: calc(50% - 1rem);
-      }
-      ul li * {
-        text-decoration: none;
-        transition: 0.2s ease;
-      }
-      ul li:first-child {
-        width: 100%;
-        margin-bottom: 1rem;
-        text-align: center;
-      }
-      ul li:first-child img {
-        width: 100%;
-      }
-      ul li:first-child .title {
-        font-size: 2.369rem;
-      }
-      ul li img {
-        margin-bottom: 0.5rem;
-        border-radius: 12px;
-      }
-      .placeholder-image {
-        width: 100%;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 0.5rem;
-        color: rgba(255, 255, 255, 0.6);
-      }
-      ul li a {
-        display: block;
-      }
-      .title {
-        margin: 0;
-        color: rgb(var(--black));
-        line-height: 1;
-      }
-      .date {
-        margin: 0;
-        color: rgb(var(--gray));
-      }
-      ul li a:hover h4,
-      ul li a:hover .date {
-        color: rgb(var(--accent));
-      }
-      ul a:hover img {
-        box-shadow: var(--box-shadow);
-      }
-      @media (max-width: 720px) {
-        ul {
-          gap: 0.5em;
-        }
-        ul li {
-          width: 100%;
-          text-align: center;
-        }
-        ul li:first-child {
-          margin-bottom: 0;
-        }
-        ul li:first-child .title {
-          font-size: 1.563em;
-        }
-      }
-    </style>
   </head>
   <body>
     <Header />
-    <main>
-      <section class="search-section">
-        <Search
-          placeholder="Search projects and blog posts..."
-          searchData={searchData.all}
-        />
+    <main class="projects-main">
+      <!-- Hero Section -->
+      <section class="projects-hero">
+        <div class="projects-hero-content">
+          <h1 class="projects-title">Projects</h1>
+          <p class="projects-subtitle">
+            A showcase of my development work and personal projects
+          </p>
+        </div>
       </section>
-      <section>
-        <ul>
+
+      <!-- Search & Filters Section -->
+      <section class="search-filters-section">
+        <div class="search-container">
+          <Search
+            placeholder="Search blog posts and projects..."
+            searchData={searchData.all}
+          />
+        </div>
+
+        <div class="filters-container">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all"
+              >All Projects</button
+            >
+            {
+              allTags.map(tag => (
+                <button class="filter-btn" data-filter={tag.toLowerCase()}>
+                  {tag}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects Section -->
+      <section class="projects-section">
+        <div class="projects-layout" id="projects-layout">
+          <!-- Featured Project -->
           {
-            allProjects.map(project => (
-              <li>
-                <a href={`/projects/${project.slug}/`}>
-                  {project.data.heroImage ? (
-                    <Image
-                      width={720}
-                      height={360}
-                      src={project.data.heroImage}
-                      alt=""
-                    />
-                  ) : (
-                    <div class="placeholder-image">
-                      <svg
-                        width="60"
-                        height="60"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14,2 14,8 20,8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10,9 9,9 8,9" />
-                      </svg>
-                    </div>
-                  )}
-                  <h4 class="title">{project.data.title}</h4>
-                  {project.data.year && <p class="date">{project.data.year}</p>}
-                </a>
-              </li>
-            ))
+            allProjects.length > 0 && (
+              <div
+                class="featured-project scroll-animate"
+                data-tags={
+                  allProjects[0].data.tags
+                    ?.map(tag => tag.toLowerCase())
+                    .join(' ') || ''
+                }
+                style="animation-delay: 0s"
+              >
+                <ProjectCard project={allProjects[0]} featured={true} />
+              </div>
+            )
           }
-        </ul>
+
+          <!-- Grid Projects -->
+          <div class="projects-grid" id="projects-grid">
+            {
+              allProjects.slice(1).map((project, index) => (
+                <div
+                  class="project-grid-item scroll-animate"
+                  data-tags={
+                    project.data.tags
+                      ?.map(tag => tag.toLowerCase())
+                      .join(' ') || ''
+                  }
+                  style={`animation-delay: ${(index + 1) * 0.1}s`}
+                >
+                  <ProjectCard project={project} featured={false} />
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="no-results" id="no-results" style="display: none;">
+          <div class="no-results-content">
+            <h3>No projects found</h3>
+            <p>Try adjusting your search or filter criteria.</p>
+          </div>
+        </div>
       </section>
     </main>
     <Footer />
   </body>
 </html>
+
+<style>
+  .projects-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .projects-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+  }
+
+  .projects-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    margin: 0 0 1.5rem 0;
+    background: linear-gradient(
+      135deg,
+      var(--accent),
+      var(--orange),
+      var(--purple)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease-in-out infinite;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+
+  .projects-subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  @keyframes gradientShift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .search-filters-section {
+    margin-bottom: 3rem;
+  }
+
+  .search-container {
+    margin-bottom: 2rem;
+  }
+
+  .filters-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 2rem;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--accent-rgb), 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+  }
+
+  .filter-btn:hover::before {
+    left: 100%;
+  }
+
+  .filter-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+  }
+
+  .projects-section {
+    position: relative;
+  }
+
+  .projects-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .featured-project {
+    margin-bottom: 1rem;
+  }
+
+  .featured-project :global(.project-card) {
+    max-width: none;
+    width: 100%;
+  }
+
+  .featured-project :global(.project-card.featured) {
+    grid-column: unset;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 400px;
+  }
+
+  .featured-project :global(.project-card-image) {
+    flex: 0 0 50%;
+    height: auto;
+    margin-bottom: 0;
+    margin-right: 2rem;
+  }
+
+  .featured-project :global(.project-card-content) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .featured-project :global(.project-card-title) {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .featured-project :global(.project-card-description) {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  .project-grid-item {
+    display: block;
+    width: 100%;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+  }
+
+  .no-results-content h3 {
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+  }
+
+  .no-results-content p {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  /* Dark mode styles */
+  :global(.dark) .projects-title {
+    color: white;
+  }
+
+  :global(.dark) .projects-subtitle {
+    color: rgb(209, 213, 219);
+  }
+
+  :global(.dark) .filter-btn {
+    background: rgb(31, 41, 55);
+    border-color: rgb(55, 65, 81);
+    color: rgb(156, 163, 175);
+  }
+
+  :global(.dark) .no-results-content h3 {
+    color: white;
+  }
+
+  :global(.dark) .no-results-content p {
+    color: rgb(156, 163, 175);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .projects-main {
+      padding: 1rem;
+    }
+
+    .projects-title {
+      font-size: 2.5rem;
+    }
+
+    .projects-subtitle {
+      font-size: 1.125rem;
+    }
+
+    .featured-project :global(.project-card.featured) {
+      flex-direction: column;
+      min-height: auto;
+    }
+
+    .featured-project :global(.project-card-image) {
+      flex: none;
+      height: 250px;
+      margin-right: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .featured-project :global(.project-card-content) {
+      padding: 1.5rem;
+    }
+
+    .featured-project :global(.project-card-title) {
+      font-size: 2rem;
+    }
+
+    .featured-project :global(.project-card-description) {
+      font-size: 1rem;
+    }
+
+    .projects-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .filter-group {
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .filter-btn {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .projects-title {
+      font-size: 2rem;
+    }
+
+    .projects-hero {
+      margin-bottom: 2rem;
+    }
+
+    .search-filters-section {
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
+<script>
+  // Filter functionality
+  document.addEventListener('DOMContentLoaded', function () {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const featuredProject = document.querySelector(
+      '.featured-project'
+    ) as HTMLElement | null;
+    const projectItems = document.querySelectorAll(
+      '.project-grid-item'
+    ) as NodeListOf<HTMLElement>;
+    const noResults = document.getElementById(
+      'no-results'
+    ) as HTMLElement | null;
+    const projectsLayout = document.getElementById(
+      'projects-layout'
+    ) as HTMLElement | null;
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function (this: HTMLElement) {
+        // Update active state
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const filter = this.dataset.filter;
+
+        // Filter featured project
+        let featuredVisible = false;
+        if (featuredProject && filter) {
+          const featuredTags = featuredProject.dataset.tags || '';
+          const shouldShowFeatured =
+            filter === 'all' || featuredTags.includes(filter);
+
+          if (shouldShowFeatured) {
+            featuredProject.style.display = 'block';
+            featuredProject.style.animation =
+              'slideInUp 0.6s ease-out forwards';
+            featuredVisible = true;
+          } else {
+            featuredProject.style.display = 'none';
+          }
+        }
+
+        // Filter grid items
+        let visibleCount = 0;
+        if (filter) {
+          projectItems.forEach(item => {
+            const tags = item.dataset.tags || '';
+            const shouldShow = filter === 'all' || tags.includes(filter);
+
+            if (shouldShow) {
+              item.style.display = '';
+              item.style.animation = 'slideInUp 0.6s ease-out forwards';
+              visibleCount++;
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        }
+
+        // Show/hide no results
+        const totalVisible = (featuredVisible ? 1 : 0) + visibleCount;
+        if (totalVisible === 0) {
+          if (noResults) noResults.style.display = 'block';
+          if (projectsLayout) projectsLayout.style.display = 'none';
+        } else {
+          if (noResults) noResults.style.display = 'none';
+          if (projectsLayout) projectsLayout.style.display = 'flex';
+        }
+      });
+    });
+  });
+
+  // Initialize scroll animations for this page
+  function initPageScrollAnimations() {
+    console.log('Projects page: Initializing scroll animations');
+
+    // First, ensure all elements start hidden
+    const elements = document.querySelectorAll('.scroll-animate');
+    console.log(
+      'Projects page: Found scroll-animate elements:',
+      elements.length
+    );
+
+    elements.forEach(element => {
+      // Remove any existing animate-in class and ensure element is hidden
+      element.classList.remove('animate-in');
+      console.log('Projects page: Reset element:', element);
+    });
+
+    if (!('IntersectionObserver' in window)) {
+      console.log(
+        'No IntersectionObserver, showing elements immediately:',
+        elements.length
+      );
+      elements.forEach(element => {
+        element.classList.add('animate-in');
+      });
+      return;
+    }
+
+    // Wait a moment before starting observations to ensure elements are properly hidden
+    setTimeout(() => {
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              console.log('Projects page: Element animating in:', entry.target);
+              entry.target.classList.add('animate-in');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px',
+        }
+      );
+
+      elements.forEach(element => {
+        console.log('Projects page: Observing element:', element);
+        observer.observe(element);
+      });
+    }, 100);
+  }
+
+  // Initialize when page loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPageScrollAnimations);
+  } else {
+    initPageScrollAnimations();
+  }
+</script>

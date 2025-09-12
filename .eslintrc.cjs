@@ -45,6 +45,16 @@ module.exports = {
         '@typescript-eslint/no-var-requires': 'off',
       },
     },
+    {
+      files: ['src/scripts/*.js'],
+      env: {
+        browser: true,
+        es2022: true,
+      },
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
   ],
   env: {
     browser: true,
