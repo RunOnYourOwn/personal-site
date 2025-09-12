@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  personal-site:
+    image: ghcr.io/runonyourown/personal-site:latest
+    container_name: personal-site
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - proxy
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "swag.enable=true"
+
+networks:
+  proxy:
+    external: true
