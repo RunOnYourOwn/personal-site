@@ -2,7 +2,7 @@
 // Hero component for the landing page
 ---
 
-<section class="hero">
+<section class="hero particles-bg">
   <!-- Floating background elements -->
   <div class="hero-bg">
     <div class="floating-element element-1"></div>
@@ -13,99 +13,114 @@
     <div class="grid-overlay"></div>
   </div>
 
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="badge-text">Senior Data Scientist</span>
-      <div class="badge-pulse"></div>
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-text">Senior Data Scientist</span>
+        <div class="badge-pulse"></div>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="title-line">Hi, I'm</span>
+        <span class="title-line highlight">Aaron Brazier</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        <span class="subtitle-line"
+          >Data Science & Machine Learning Engineer</span
+        >
+        <span class="subtitle-line"
+          >Homelab Enthusiast & Infrastructure Automation</span
+        >
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">8+</span>
+          <span class="stat-label">Years Experience</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">15+</span>
+          <span class="stat-label">Certifications</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">∞</span>
+          <span class="stat-label">Learning</span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="/projects" class="btn btn-primary btn-enhanced">
+          <span class="btn-text">View My Work</span>
+        </a>
+        <a href="/blog" class="btn btn-secondary btn-enhanced">
+          <span class="btn-text">Read My Blog</span>
+        </a>
+      </div>
     </div>
 
-    <h1 class="hero-title">
-      <span class="title-line">Hi, I'm</span>
-      <span class="title-line highlight">Aaron Brazier</span>
-    </h1>
-
-    <p class="hero-subtitle">
-      <span class="subtitle-line">Data Science & Machine Learning Engineer</span
-      >
-      <span class="subtitle-line"
-        >Homelab Enthusiast & Infrastructure Automation</span
-      >
-    </p>
-
-    <div class="hero-stats">
-      <div class="stat-item">
-        <span class="stat-number">8+</span>
-        <span class="stat-label">Years Experience</span>
+    <div class="hero-visual">
+      <div class="cyber-terminal">
+        <div class="terminal-header">
+          <div class="terminal-buttons">
+            <span class="btn-close"></span>
+            <span class="btn-minimize"></span>
+            <span class="btn-maximize"></span>
+          </div>
+          <div class="terminal-title">aaron@terminal:~$</div>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="prompt">$</span>
+            <span class="command">whoami</span>
+          </div>
+          <div class="terminal-line output">
+            <span class="output-text">Senior Data Scientist</span>
+          </div>
+          <div class="terminal-line">
+            <span class="prompt">$</span>
+            <span class="command">cat skills.txt</span>
+          </div>
+          <div class="terminal-line output">
+            <span class="output-text"
+              >Python • PyTorch • TensorFlow • Azure • Docker</span
+            >
+          </div>
+          <div class="terminal-line">
+            <span class="prompt">$</span>
+            <span class="command typing">ls homelab/</span>
+            <span class="cursor">_</span>
+          </div>
+        </div>
       </div>
-      <div class="stat-item">
-        <span class="stat-number">15+</span>
-        <span class="stat-label">Certifications</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">∞</span>
-        <span class="stat-label">Learning</span>
-      </div>
-    </div>
-
-    <div class="hero-actions">
-      <a href="/projects" class="btn btn-primary">
-        <span class="btn-text">View My Work</span>
-      </a>
-      <a href="/blog" class="btn btn-secondary">
-        <span class="btn-text">Read My Blog</span>
-      </a>
     </div>
   </div>
 
-  <div class="hero-visual">
-    <div class="cyber-terminal">
-      <div class="terminal-header">
-        <div class="terminal-buttons">
-          <span class="btn-close"></span>
-          <span class="btn-minimize"></span>
-          <span class="btn-maximize"></span>
-        </div>
-        <div class="terminal-title">aaron@terminal:~$</div>
-      </div>
-      <div class="terminal-body">
-        <div class="terminal-line">
-          <span class="prompt">$</span>
-          <span class="command">whoami</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text">Senior Data Scientist</span>
-        </div>
-        <div class="terminal-line">
-          <span class="prompt">$</span>
-          <span class="command">cat skills.txt</span>
-        </div>
-        <div class="terminal-line output">
-          <span class="output-text"
-            >Python • PyTorch • TensorFlow • Azure • Docker</span
-          >
-        </div>
-        <div class="terminal-line">
-          <span class="prompt">$</span>
-          <span class="command typing">ls homelab/</span>
-          <span class="cursor">_</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Seamless transition overlay -->
+  <div class="hero-transition"></div>
 </section>
 
 <style>
   .hero {
     position: relative;
+    min-height: 80vh;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    gap: 4rem;
     align-items: center;
-    min-height: 80vh;
-    padding: 1rem 0;
-    max-width: 1200px;
-    margin: 0 auto;
-    overflow: hidden;
+    width: 100%;
+    max-width: 1400px;
+    padding: 4rem 2rem;
   }
 
   /* Floating background elements */
@@ -204,7 +219,10 @@
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
+    padding: 0 2rem;
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .hero-badge {
@@ -212,6 +230,7 @@
     align-items: center;
     gap: 0.5rem;
     background: rgba(var(--accent-rgb), 0.1);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(var(--accent-rgb), 0.3);
     border-radius: 2rem;
     padding: 0.5rem 1rem;
@@ -256,11 +275,12 @@
   }
 
   .hero-title {
-    font-size: 4rem;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 800;
     line-height: 1.1;
     margin: 0;
     color: var(--text-primary);
+    letter-spacing: -0.04em;
   }
 
   .title-line {
@@ -308,10 +328,12 @@
   }
 
   .hero-subtitle {
-    font-size: 1.25rem;
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
     line-height: 1.6;
     color: var(--text-secondary);
     margin: 0;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 
   .subtitle-line {
@@ -428,6 +450,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 2rem;
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .cyber-terminal {
@@ -563,28 +588,84 @@
     color: inherit;
   }
 
+  /* Seamless transition overlay */
+  .hero-transition {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Light mode transition (default state when .dark is not present) */
+  .hero-transition {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 30%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0.9) 85%,
+      rgb(255, 255, 255) 100%
+    );
+  }
+
+  /* Dark mode transition (overrides the default) */
+  :global(.dark) .hero-transition {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(17, 24, 39, 0.3) 30%,
+      rgba(17, 24, 39, 0.6) 60%,
+      rgba(17, 24, 39, 0.9) 85%,
+      rgb(17, 24, 39) 100%
+    );
+  }
+
   /* Responsive design */
+  @media (max-width: 1024px) {
+    .hero-container {
+      gap: 3rem;
+      padding: 3rem 2rem;
+    }
+
+    .hero-content,
+    .hero-visual {
+      max-width: 500px;
+    }
+  }
+
   @media (max-width: 768px) {
-    .hero {
+    .hero-container {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 2.5rem;
       text-align: center;
-      min-height: auto;
-      padding: 2rem 1rem;
+      padding: 3rem 1.5rem;
+    }
+
+    .hero-content,
+    .hero-visual {
+      padding: 0 1rem;
+      max-width: 100%;
     }
 
     .hero-title {
       font-size: 2.5rem;
+      line-height: 1.1;
     }
 
     .hero-subtitle {
       font-size: 1.125rem;
+      line-height: 1.6;
     }
 
     .hero-stats {
       justify-content: center;
       flex-wrap: wrap;
       gap: 1rem;
+      max-width: 400px;
+      margin: 0 auto;
     }
 
     .hero-actions {
@@ -594,6 +675,35 @@
 
     .cyber-terminal {
       max-width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-container {
+      padding: 2rem 1rem;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-stats {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hero-transition {
+      height: 80px;
     }
   }
 </style>

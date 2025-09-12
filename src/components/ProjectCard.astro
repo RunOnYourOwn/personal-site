@@ -10,11 +10,59 @@ interface Props {
 
 const { project, featured = false } = Astro.props;
 const { slug, data } = project;
-const { title, description, year, heroImage } = data;
+const { title, description, year, tags, heroImage } = data;
+
+// Function to get themed color for tags
+const getTagColor = (tag: string) => {
+  const tagLower = tag.toLowerCase();
+
+  // Data science tags
+  if (
+    tagLower.includes('data') ||
+    tagLower.includes('ml') ||
+    tagLower.includes('ai') ||
+    tagLower.includes('python') ||
+    tagLower.includes('pandas') ||
+    tagLower.includes('pytorch')
+  ) {
+    return 'purple';
+  }
+
+  // Homelab/infrastructure tags
+  if (
+    tagLower.includes('homelab') ||
+    tagLower.includes('docker') ||
+    tagLower.includes('kubernetes') ||
+    tagLower.includes('infrastructure') ||
+    tagLower.includes('devops') ||
+    tagLower.includes('monitoring')
+  ) {
+    return 'green';
+  }
+
+  // Project/development tags
+  if (
+    tagLower.includes('project') ||
+    tagLower.includes('web') ||
+    tagLower.includes('frontend') ||
+    tagLower.includes('backend') ||
+    tagLower.includes('fullstack') ||
+    tagLower.includes('react')
+  ) {
+    return 'orange';
+  }
+
+  // Default to blue for other tags
+  return 'blue';
+};
+
+const formatYear = (year: number) => {
+  return year.toString();
+};
 ---
 
 <Card
-  href={`/projects/${slug}`}
+  href={`/projects/${slug}/`}
   class={featured ? 'project-card featured' : 'project-card'}
 >
   <div class="project-card-image">
@@ -31,11 +79,9 @@ const { title, description, year, heroImage } = data;
             stroke="currentColor"
             stroke-width="1.5"
           >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14,2 14,8 20,8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-            <polyline points="10,9 9,9 8,9" />
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21,15 16,10 5,21" />
           </svg>
         </div>
       )
@@ -44,40 +90,93 @@ const { title, description, year, heroImage } = data;
 
   <div class="project-card-content">
     <div class="project-card-meta">
-      {year && <time datetime={year.toString()}>{year}</time>}
+      <time datetime={year?.toString()}>
+        {year ? formatYear(year) : 'Ongoing'}
+      </time>
+      {
+        tags && tags.length > 0 && (
+          <div class="project-card-tags">
+            {tags.slice(0, 3).map(tag => {
+              const color = getTagColor(tag);
+              return <span class={`tag tag-${color}`}>{tag}</span>;
+            })}
+          </div>
+        )
+      }
     </div>
 
     <h3 class="project-card-title">{title}</h3>
     <p class="project-card-description">{description}</p>
+
+    <div class="project-card-footer">
+      <span class="view-project">View project</span>
+    </div>
   </div>
 </Card>
 
 <style>
   .project-card {
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background: var(--bg-card);
-    border-radius: 12px;
     overflow: hidden;
-    transition: all 0.2s ease;
-    border: 1px solid var(--border);
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--accent-rgb), 0.1) 0%,
+      rgba(139, 92, 246, 0.1) 25%,
+      rgba(16, 185, 129, 0.1) 50%,
+      rgba(245, 158, 11, 0.1) 75%,
+      rgba(var(--accent-rgb), 0.1) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  .project-card:hover::before {
+    opacity: 1;
   }
 
   .project-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(var(--accent-rgb), 0.2),
+      0 0 20px rgba(var(--accent-rgb), 0.1);
   }
 
   .project-card.featured {
     grid-column: span 2;
   }
 
+  .project-card.featured:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow:
+      0 25px 50px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(var(--accent-rgb), 0.3),
+      0 0 30px rgba(var(--accent-rgb), 0.2);
+  }
+
   .project-card-image {
     width: 100%;
     height: 200px;
     overflow: hidden;
+    border-radius: 0.75rem;
+    margin-bottom: 1.25rem;
     position: relative;
+    z-index: 2;
   }
 
   .project-card.featured .project-card-image {
@@ -88,11 +187,13 @@ const { title, description, year, heroImage } = data;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.2s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: brightness(1) saturate(1);
   }
 
   .project-card:hover .project-card-image img {
-    transform: scale(1.05);
+    transform: scale(1.08) rotate(1deg);
+    filter: brightness(1.1) saturate(1.2);
   }
 
   .project-placeholder {
@@ -101,83 +202,279 @@ const { title, description, year, heroImage } = data;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-secondary);
+    background: linear-gradient(
+      135deg,
+      var(--bg-secondary),
+      var(--accent-light)
+    );
     color: var(--text-secondary);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-placeholder::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
   }
 
   .project-card:hover .project-placeholder {
-    background: var(--accent-light);
-    color: var(--accent);
+    background: linear-gradient(135deg, var(--accent-light), var(--accent));
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .project-card:hover .project-placeholder::before {
+    transform: rotate(45deg) translate(100%, 100%);
   }
 
   .project-card-content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: 1.5rem;
+    position: relative;
+    z-index: 2;
   }
 
   .project-card-meta {
-    margin-bottom: 0.75rem;
-  }
-
-  .project-card-meta time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
     font-size: 0.875rem;
     color: var(--text-secondary);
+    transition: color 0.3s ease;
+  }
+
+  .project-card:hover .project-card-meta {
+    color: var(--accent);
+  }
+
+  .project-card-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    padding: 0.375rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
     font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Themed tag colors */
+  .tag-blue {
+    background: rgba(var(--accent-rgb), 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+  }
+
+  .tag-purple {
+    background: rgba(var(--purple-rgb), 0.1);
+    color: var(--purple);
+    border: 1px solid rgba(var(--purple-rgb), 0.2);
+  }
+
+  .tag-green {
+    background: rgba(var(--green-rgb), 0.1);
+    color: var(--green);
+    border: 1px solid rgba(var(--green-rgb), 0.2);
+  }
+
+  .tag-orange {
+    background: rgba(var(--orange-rgb), 0.1);
+    color: var(--orange);
+    border: 1px solid rgba(var(--orange-rgb), 0.2);
+  }
+
+  .tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .project-card:hover .tag-blue {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover .tag-purple {
+    background: var(--purple);
+    color: white;
+    border-color: var(--purple);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover .tag-green {
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover .tag-orange {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover .tag::before {
+    left: 100%;
   }
 
   .project-card-title {
     font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 0.75rem 0;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
     color: var(--text-primary);
     line-height: 1.3;
+    transition: all 0.3s ease;
+    position: relative;
   }
 
   .project-card.featured .project-card-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+  }
+
+  .project-card:hover .project-card-title {
+    color: var(--accent);
+    transform: translateX(4px);
   }
 
   .project-card-description {
-    font-size: 0.875rem;
     color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 0;
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
     flex-grow: 1;
+    transition: color 0.3s ease;
+  }
+
+  .project-card:hover .project-card-description {
+    color: var(--text-primary);
+  }
+
+  .project-card-footer {
+    margin-top: auto;
+    position: relative;
+  }
+
+  .view-project {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .view-project::after {
+    content: '→';
+    transition: transform 0.3s ease;
+  }
+
+  .project-card:hover .view-project {
+    color: var(--accent-dark);
+    transform: translateX(4px);
+  }
+
+  .project-card:hover .view-project::after {
+    transform: translateX(4px);
   }
 
   /* Dark mode styles */
-  :global(.dark) .project-card {
-    background: rgb(31, 41, 55);
-    border-color: rgb(55, 65, 81);
+  :global(.dark) .project-card-meta {
+    color: rgb(156, 163, 175);
   }
 
-  :global(.dark) .project-card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  :global(.dark) .project-card:hover .project-card-meta {
+    color: var(--accent);
   }
 
   :global(.dark) .project-card-title {
     color: white;
   }
 
+  :global(.dark) .project-card:hover .project-card-title {
+    color: var(--accent);
+  }
+
   :global(.dark) .project-card-description {
     color: rgb(209, 213, 219);
   }
 
-  :global(.dark) .project-card-meta time {
-    color: rgb(156, 163, 175);
+  :global(.dark) .project-card:hover .project-card-description {
+    color: white;
+  }
+
+  :global(.dark) .tag-blue {
+    background: rgba(var(--accent-rgb), 0.2);
+    color: var(--accent);
+    border-color: rgba(var(--accent-rgb), 0.3);
+  }
+
+  :global(.dark) .tag-purple {
+    background: rgba(var(--purple-rgb), 0.2);
+    color: var(--purple);
+    border-color: rgba(var(--purple-rgb), 0.3);
+  }
+
+  :global(.dark) .tag-green {
+    background: rgba(var(--green-rgb), 0.2);
+    color: var(--green);
+    border-color: rgba(var(--green-rgb), 0.3);
+  }
+
+  :global(.dark) .tag-orange {
+    background: rgba(var(--orange-rgb), 0.2);
+    color: var(--orange);
+    border-color: rgba(var(--orange-rgb), 0.3);
   }
 
   :global(.dark) .project-placeholder {
-    background: rgb(55, 65, 81);
+    background: linear-gradient(
+      135deg,
+      rgb(31, 41, 55),
+      rgba(var(--accent-rgb), 0.2)
+    );
     color: rgb(156, 163, 175);
   }
 
   :global(.dark) .project-card:hover .project-placeholder {
-    background: rgba(var(--accent-rgb), 0.2);
-    color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: white;
   }
 
   /* Responsive design */
@@ -186,24 +483,36 @@ const { title, description, year, heroImage } = data;
       grid-column: span 1;
     }
 
-    .project-card-image {
-      height: 180px;
-    }
-
     .project-card.featured .project-card-image {
       height: 200px;
     }
 
-    .project-card-content {
-      padding: 1rem;
-    }
-
-    .project-card-title {
-      font-size: 1.125rem;
-    }
-
     .project-card.featured .project-card-title {
       font-size: 1.25rem;
+    }
+
+    .project-card-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px) scale(1.01);
+    }
+
+    .project-card.featured:hover {
+      transform: translateY(-6px) scale(1.02);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .project-card:hover {
+      transform: translateY(-2px) scale(1.005);
+    }
+
+    .project-card.featured:hover {
+      transform: translateY(-3px) scale(1.01);
     }
   }
 </style>
