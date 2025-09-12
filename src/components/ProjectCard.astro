@@ -1,0 +1,202 @@
+---
+// ProjectCard component for displaying project previews
+import type { CollectionEntry } from 'astro:content';
+import Card from './Card.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  featured?: boolean;
+}
+
+const { project, featured = false } = Astro.props;
+const { slug, data } = project;
+const { title, description, year, heroImage } = data;
+---
+
+<Card href={`/projects/${slug}`} class={featured ? 'project-card featured' : 'project-card'}>
+  <div class="project-card-image">
+    {heroImage ? (
+      <img 
+        src={heroImage.src} 
+        alt={heroImage.alt || title}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="project-placeholder">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10,9 9,9 8,9"/>
+        </svg>
+      </div>
+    )}
+  </div>
+  
+  <div class="project-card-content">
+    <div class="project-card-meta">
+      {year && <time datetime={year.toString()}>{year}</time>}
+    </div>
+    
+    <h3 class="project-card-title">{title}</h3>
+    <p class="project-card-description">{description}</p>
+  </div>
+</Card>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+  }
+
+  .project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .project-card.featured {
+    grid-column: span 2;
+  }
+
+  .project-card-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .project-card.featured .project-card-image {
+    height: 300px;
+  }
+
+  .project-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+  }
+
+  .project-card:hover .project-card-image img {
+    transform: scale(1.05);
+  }
+
+  .project-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-radius: 0.5rem;
+  }
+
+  .project-card:hover .project-placeholder {
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .project-card-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1.5rem;
+  }
+
+  .project-card-meta {
+    margin-bottom: 0.75rem;
+  }
+
+  .project-card-meta time {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .project-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .project-card.featured .project-card-title {
+    font-size: 1.5rem;
+  }
+
+  .project-card-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  /* Dark mode styles */
+  :global(.dark) .project-card {
+    background: rgb(31, 41, 55);
+    border-color: rgb(55, 65, 81);
+  }
+
+  :global(.dark) .project-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.dark) .project-card-title {
+    color: white;
+  }
+
+  :global(.dark) .project-card-description {
+    color: rgb(209, 213, 219);
+  }
+
+  :global(.dark) .project-card-meta time {
+    color: rgb(156, 163, 175);
+  }
+
+  :global(.dark) .project-placeholder {
+    background: rgb(55, 65, 81);
+    color: rgb(156, 163, 175);
+  }
+
+  :global(.dark) .project-card:hover .project-placeholder {
+    background: rgba(var(--accent-rgb), 0.2);
+    color: var(--accent);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .project-card.featured {
+      grid-column: span 1;
+    }
+
+    .project-card-image {
+      height: 180px;
+    }
+
+    .project-card.featured .project-card-image {
+      height: 200px;
+    }
+
+    .project-card-content {
+      padding: 1rem;
+    }
+
+    .project-card-title {
+      font-size: 1.125rem;
+    }
+
+    .project-card.featured .project-card-title {
+      font-size: 1.25rem;
+    }
+  }
+</style>

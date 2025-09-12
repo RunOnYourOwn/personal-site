@@ -1,0 +1,68 @@
+---
+// BaseLayout component for consistent page structure
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+}
+
+const { title, description, image } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} image={image} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  main {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Dark mode styles */
+  :global(.dark) html {
+    color: white;
+    background: rgb(17, 24, 39);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    main {
+      padding: 0 1rem;
+    }
+  }
+</style>
