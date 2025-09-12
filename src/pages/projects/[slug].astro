@@ -5,11 +5,11 @@ import Header from '../../components/Header.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-	const projects = await getCollection('projects');
-	return projects.map((project) => ({
-		params: { slug: project.slug },
-		props: { project },
-	}));
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
 }
 
 const { project } = Astro.props;
@@ -18,273 +18,289 @@ const { Content } = await project.render();
 
 <!doctype html>
 <html lang="en" class="dark">
-	<head>
-		<BaseHead title={`${project.data.title} - Projects`} description={project.data.description} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<article>
-				<div class="project-header">
-					<div class="project-meta">
-						{project.data.year && <span class="year">{project.data.year}</span>}
-						<span class={`status-badge ${project.data.status}`}>
-							{project.data.status.replace('-', ' ')}
-						</span>
-					</div>
-					<h1>{project.data.title}</h1>
-					<p class="description">{project.data.description}</p>
-					
-					<div class="project-links">
-						{project.data.link && (
-							<a href={project.data.link} target="_blank" rel="noopener noreferrer" class="link-button primary">
-								🌐 Live Site
-							</a>
-						)}
-						{project.data.repo && (
-							<a href={project.data.repo} target="_blank" rel="noopener noreferrer" class="link-button secondary">
-								📁 Repository
-							</a>
-						)}
-					</div>
+  <head>
+    <BaseHead
+      title={`${project.data.title} - Projects`}
+      description={project.data.description}
+    />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <article>
+        <div class="project-header">
+          <div class="project-meta">
+            {project.data.year && <span class="year">{project.data.year}</span>}
+            <span class={`status-badge ${project.data.status}`}>
+              {project.data.status.replace('-', ' ')}
+            </span>
+          </div>
+          <h1>{project.data.title}</h1>
+          <p class="description">{project.data.description}</p>
 
-					<div class="tags">
-						{project.data.tags.map((tag) => (
-							<span class="tag">{tag}</span>
-						))}
-					</div>
-				</div>
+          <div class="project-links">
+            {
+              project.data.link && (
+                <a
+                  href={project.data.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="link-button primary"
+                >
+                  🌐 Live Site
+                </a>
+              )
+            }
+            {
+              project.data.repo && (
+                <a
+                  href={project.data.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="link-button secondary"
+                >
+                  📁 Repository
+                </a>
+              )
+            }
+          </div>
 
-				<div class="content">
-					<Content />
-				</div>
-			</article>
-		</main>
-		<Footer />
-	</body>
+          <div class="tags">
+            {project.data.tags.map(tag => <span class="tag">{tag}</span>)}
+          </div>
+        </div>
+
+        <div class="content">
+          <Content />
+        </div>
+      </article>
+    </main>
+    <Footer />
+  </body>
 </html>
 
 <style>
-	.project-header {
-		margin-bottom: 3rem;
-		padding-bottom: 2rem;
-		border-bottom: 1px solid rgb(var(--gray-light));
-	}
+  .project-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgb(var(--gray-light));
+  }
 
-	.project-meta {
-		display: flex;
-		gap: 1rem;
-		margin-bottom: 1rem;
-		align-items: center;
-	}
+  .project-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
 
-	.year {
-		background: rgb(var(--gray-light));
-		color: rgb(var(--gray-dark));
-		padding: 0.5rem 1rem;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		font-weight: 500;
-	}
+  .year {
+    background: rgb(var(--gray-light));
+    color: rgb(var(--gray-dark));
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
 
-	.status-badge {
-		padding: 0.5rem 1rem;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		font-weight: 500;
-		text-transform: capitalize;
-	}
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
 
-	.status-badge.completed {
-		background: #10b981;
-		color: white;
-	}
+  .status-badge.completed {
+    background: #10b981;
+    color: white;
+  }
 
-	.status-badge.in-progress {
-		background: #f59e0b;
-		color: white;
-	}
+  .status-badge.in-progress {
+    background: #f59e0b;
+    color: white;
+  }
 
-	.status-badge.archived {
-		background: rgb(var(--gray));
-		color: white;
-	}
+  .status-badge.archived {
+    background: rgb(var(--gray));
+    color: white;
+  }
 
-	.project-header h1 {
-		margin: 0 0 1rem 0;
-		font-size: 2.5rem;
-		line-height: 1.2;
-	}
+  .project-header h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
 
-	.description {
-		font-size: 1.25rem;
-		color: rgb(var(--gray-dark));
-		margin-bottom: 2rem;
-		line-height: 1.6;
-	}
+  .description {
+    font-size: 1.25rem;
+    color: rgb(var(--gray-dark));
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
 
-	.project-links {
-		display: flex;
-		gap: 1rem;
-		margin-bottom: 2rem;
-	}
+  .project-links {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
 
-	.link-button {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.75rem 1.5rem;
-		border-radius: 8px;
-		text-decoration: none;
-		font-weight: 500;
-		transition: all 0.2s ease;
-	}
+  .link-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
 
-	.link-button.primary {
-		background: var(--accent);
-		color: white;
-	}
+  .link-button.primary {
+    background: var(--accent);
+    color: white;
+  }
 
-	.link-button.primary:hover {
-		background: var(--accent-dark);
-		transform: translateY(-1px);
-	}
+  .link-button.primary:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+  }
 
-	.link-button.secondary {
-		background: transparent;
-		color: var(--accent);
-		border: 2px solid var(--accent);
-	}
+  .link-button.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+  }
 
-	.link-button.secondary:hover {
-		background: var(--accent);
-		color: white;
-		transform: translateY(-1px);
-	}
+  .link-button.secondary:hover {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-1px);
+  }
 
-	.tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 
-	.tag {
-		background: var(--accent);
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		font-weight: 500;
-	}
+  .tag {
+    background: var(--accent);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
 
-	.content {
-		line-height: 1.7;
-	}
+  .content {
+    line-height: 1.7;
+  }
 
-	.content h2 {
-		margin-top: 2rem;
-		margin-bottom: 1rem;
-		color: rgb(var(--black));
-	}
+  .content h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: rgb(var(--black));
+  }
 
-	.content h3 {
-		margin-top: 1.5rem;
-		margin-bottom: 0.75rem;
-		color: rgb(var(--black));
-	}
+  .content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: rgb(var(--black));
+  }
 
-	.content p {
-		margin-bottom: 1.5rem;
-	}
+  .content p {
+    margin-bottom: 1.5rem;
+  }
 
-	.content ul, .content ol {
-		margin-bottom: 1.5rem;
-		padding-left: 2rem;
-	}
+  .content ul,
+  .content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+  }
 
-	.content li {
-		margin-bottom: 0.5rem;
-	}
+  .content li {
+    margin-bottom: 0.5rem;
+  }
 
-	.content code {
-		background: rgb(var(--gray-light));
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-family: 'JetBrains Mono', monospace;
-	}
+  .content code {
+    background: rgb(var(--gray-light));
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-	.content pre {
-		background: rgb(var(--gray-light));
-		padding: 1.5rem;
-		border-radius: 8px;
-		overflow-x: auto;
-		margin-bottom: 1.5rem;
-	}
+  .content pre {
+    background: rgb(var(--gray-light));
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
 
-	.content pre code {
-		background: none;
-		padding: 0;
-	}
+  .content pre code {
+    background: none;
+    padding: 0;
+  }
 
-	/* Dark mode styles */
-	:global(.dark) .project-header {
-		border-bottom-color: rgb(55, 65, 81);
-	}
+  /* Dark mode styles */
+  :global(.dark) .project-header {
+    border-bottom-color: rgb(55, 65, 81);
+  }
 
-	:global(.dark) .year {
-		background: rgb(55, 65, 81);
-		color: rgb(209, 213, 219);
-	}
+  :global(.dark) .year {
+    background: rgb(55, 65, 81);
+    color: rgb(209, 213, 219);
+  }
 
-	:global(.dark) .description {
-		color: rgb(209, 213, 219);
-	}
+  :global(.dark) .description {
+    color: rgb(209, 213, 219);
+  }
 
-	:global(.dark) .content h2,
-	:global(.dark) .content h3 {
-		color: rgb(255, 255, 255);
-	}
+  :global(.dark) .content h2,
+  :global(.dark) .content h3 {
+    color: rgb(255, 255, 255);
+  }
 
-	:global(.dark) .content code {
-		background: rgb(55, 65, 81);
-		color: rgb(255, 255, 255);
-	}
+  :global(.dark) .content code {
+    background: rgb(55, 65, 81);
+    color: rgb(255, 255, 255);
+  }
 
-	:global(.dark) .content pre {
-		background: rgb(55, 65, 81);
-	}
+  :global(.dark) .content pre {
+    background: rgb(55, 65, 81);
+  }
 
-	:global(.dark) .link-button.primary {
-		background: var(--accent);
-		color: white !important;
-	}
+  :global(.dark) .link-button.primary {
+    background: var(--accent);
+    color: white !important;
+  }
 
-	:global(.dark) .link-button.secondary {
-		background: transparent;
-		color: var(--accent) !important;
-		border-color: var(--accent);
-	}
+  :global(.dark) .link-button.secondary {
+    background: transparent;
+    color: var(--accent) !important;
+    border-color: var(--accent);
+  }
 
-	:global(.dark) .link-button.secondary:hover {
-		background: var(--accent);
-		color: white !important;
-	}
+  :global(.dark) .link-button.secondary:hover {
+    background: var(--accent);
+    color: white !important;
+  }
 
-	@media (max-width: 720px) {
-		.project-header h1 {
-			font-size: 2rem;
-		}
+  @media (max-width: 720px) {
+    .project-header h1 {
+      font-size: 2rem;
+    }
 
-		.description {
-			font-size: 1.125rem;
-		}
+    .description {
+      font-size: 1.125rem;
+    }
 
-		.project-links {
-			flex-direction: column;
-		}
+    .project-links {
+      flex-direction: column;
+    }
 
-		.link-button {
-			justify-content: center;
-		}
-	}
+    .link-button {
+      justify-content: center;
+    }
+  }
 </style>

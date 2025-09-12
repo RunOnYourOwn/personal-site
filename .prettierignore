@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.astro/
+
+# Generated files
+package-lock.json
+
+# Public assets
+public/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

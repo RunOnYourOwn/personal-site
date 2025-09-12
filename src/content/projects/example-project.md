@@ -1,10 +1,10 @@
 ---
-title: "Example Project"
-description: "A sample project to demonstrate the projects collection functionality."
+title: 'Example Project'
+description: 'A sample project to demonstrate the projects collection functionality.'
 year: 2023
-tags: ["Example", "Demo", "Template"]
+tags: ['Example', 'Demo', 'Template']
 featured: false
-status: "completed"
+status: 'completed'
 ---
 
 This is an example project entry to demonstrate how the projects collection works. You can use this as a template for adding your own projects.

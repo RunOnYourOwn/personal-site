@@ -24,56 +24,58 @@ const featuredProjects = allProjects
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <Hero />
-  
+
   <section class="section">
     <div class="section-header">
       <h2>Featured Projects</h2>
       <p>Some of my recent work and side projects</p>
     </div>
-    
-    {featuredProjects.length > 0 ? (
-      <div class="projects-grid">
-        {featuredProjects.map((project, index) => (
-          <ProjectCard 
-            project={project} 
-            featured={index === 0} 
-          />
-        ))}
-      </div>
-    ) : (
-      <div class="empty-state">
-        <p>No featured projects yet. Check back soon!</p>
-        <a href="/projects" class="btn btn-primary">View All Projects</a>
-      </div>
-    )}
-    
+
+    {
+      featuredProjects.length > 0 ? (
+        <div class="projects-grid">
+          {featuredProjects.map((project, index) => (
+            <ProjectCard project={project} featured={index === 0} />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>No featured projects yet. Check back soon!</p>
+          <a href="/projects" class="btn btn-primary">
+            View All Projects
+          </a>
+        </div>
+      )
+    }
+
     <div class="section-footer">
       <a href="/projects" class="btn btn-secondary">View All Projects</a>
     </div>
   </section>
-  
+
   <section class="section">
     <div class="section-header">
       <h2>Latest Blog Posts</h2>
       <p>Thoughts on development, technology, and more</p>
     </div>
-    
-    {latestPosts.length > 0 ? (
-      <div class="blog-grid">
-        {latestPosts.map((post, index) => (
-          <BlogCard 
-            post={post} 
-            featured={index === 0} 
-          />
-        ))}
-      </div>
-    ) : (
-      <div class="empty-state">
-        <p>No blog posts yet. Check back soon!</p>
-        <a href="/blog" class="btn btn-primary">View All Posts</a>
-      </div>
-    )}
-    
+
+    {
+      latestPosts.length > 0 ? (
+        <div class="blog-grid">
+          {latestPosts.map((post, index) => (
+            <BlogCard post={post} featured={index === 0} />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>No blog posts yet. Check back soon!</p>
+          <a href="/blog" class="btn btn-primary">
+            View All Posts
+          </a>
+        </div>
+      )
+    }
+
     <div class="section-footer">
       <a href="/blog" class="btn btn-secondary">View All Posts</a>
     </div>

@@ -7,13 +7,13 @@ services:
     container_name: personal-site
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - '8080:80'
     networks:
       - proxy
     environment:
       - NODE_ENV=production
     labels:
-      - "swag.enable=true"
+      - 'swag.enable=true'
 
   # Development service (optional)
   personal-site-dev:
@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: personal-site-dev
     ports:
-      - "4321:4321"
+      - '4321:4321'
     volumes:
       - .:/app
       - /app/node_modules

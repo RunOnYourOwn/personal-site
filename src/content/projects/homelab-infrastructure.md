@@ -1,11 +1,11 @@
 ---
-title: "Homelab Infrastructure"
-description: "Self-hosted infrastructure setup with Docker, Portainer, SWAG, and various services for learning and development."
+title: 'Homelab Infrastructure'
+description: 'Self-hosted infrastructure setup with Docker, Portainer, SWAG, and various services for learning and development.'
 year: 2024
 tags:
-  ["Docker", "Portainer", "SWAG", "Self-hosting", "Infrastructure", "DevOps"]
+  ['Docker', 'Portainer', 'SWAG', 'Self-hosting', 'Infrastructure', 'DevOps']
 featured: true
-status: "completed"
+status: 'completed'
 ---
 
 My homelab infrastructure provides a robust foundation for self-hosting applications and learning about modern DevOps practices. The setup emphasizes security, automation, and scalability.

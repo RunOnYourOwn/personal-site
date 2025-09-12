@@ -11,7 +11,10 @@ const featuredProjects = projects.filter(project => project.data.featured);
 const otherProjects = projects.filter(project => !project.data.featured);
 
 // Sort by year (newest first)
-const sortByYear = (a: any, b: any) => (b.data.year || 0) - (a.data.year || 0);
+const sortByYear = (
+  a: CollectionEntry<'projects'>,
+  b: CollectionEntry<'projects'>
+) => (b.data.year || 0) - (a.data.year || 0);
 featuredProjects.sort(sortByYear);
 otherProjects.sort(sortByYear);
 
@@ -21,122 +24,135 @@ const allProjects = [...featuredProjects, ...otherProjects];
 
 <!doctype html>
 <html lang="en" class="dark">
-	<head>
-		<BaseHead title={`Projects - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			.placeholder-image {
-				width: 100%;
-				height: 200px;
-				background: rgba(255, 255, 255, 0.1);
-				border-radius: 12px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-bottom: 0.5rem;
-				color: rgba(255, 255, 255, 0.6);
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						allProjects.map((project) => (
-							<li>
-								<a href={`/projects/${project.slug}/`}>
-									{project.data.heroImage ? (
-										<Image width={720} height={360} src={project.data.heroImage} alt="" />
-									) : (
-										<div class="placeholder-image">
-											<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-												<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-												<polyline points="14,2 14,8 20,8"/>
-												<line x1="16" y1="13" x2="8" y2="13"/>
-												<line x1="16" y1="17" x2="8" y2="17"/>
-												<polyline points="10,9 9,9 8,9"/>
-											</svg>
-										</div>
-									)}
-									<h4 class="title">{project.data.title}</h4>
-									{project.data.year && (
-										<p class="date">{project.data.year}</p>
-									)}
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead
+      title={`Projects - ${SITE_TITLE}`}
+      description={SITE_DESCRIPTION}
+    />
+    <style>
+      main {
+        width: 960px;
+      }
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      ul li {
+        width: calc(50% - 1rem);
+      }
+      ul li * {
+        text-decoration: none;
+        transition: 0.2s ease;
+      }
+      ul li:first-child {
+        width: 100%;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      ul li:first-child img {
+        width: 100%;
+      }
+      ul li:first-child .title {
+        font-size: 2.369rem;
+      }
+      ul li img {
+        margin-bottom: 0.5rem;
+        border-radius: 12px;
+      }
+      .placeholder-image {
+        width: 100%;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      ul li a {
+        display: block;
+      }
+      .title {
+        margin: 0;
+        color: rgb(var(--black));
+        line-height: 1;
+      }
+      .date {
+        margin: 0;
+        color: rgb(var(--gray));
+      }
+      ul li a:hover h4,
+      ul li a:hover .date {
+        color: rgb(var(--accent));
+      }
+      ul a:hover img {
+        box-shadow: var(--box-shadow);
+      }
+      @media (max-width: 720px) {
+        ul {
+          gap: 0.5em;
+        }
+        ul li {
+          width: 100%;
+          text-align: center;
+        }
+        ul li:first-child {
+          margin-bottom: 0;
+        }
+        ul li:first-child .title {
+          font-size: 1.563em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section>
+        <ul>
+          {
+            allProjects.map(project => (
+              <li>
+                <a href={`/projects/${project.slug}/`}>
+                  {project.data.heroImage ? (
+                    <Image
+                      width={720}
+                      height={360}
+                      src={project.data.heroImage}
+                      alt=""
+                    />
+                  ) : (
+                    <div class="placeholder-image">
+                      <svg
+                        width="60"
+                        height="60"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14,2 14,8 20,8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10,9 9,9 8,9" />
+                      </svg>
+                    </div>
+                  )}
+                  <h4 class="title">{project.data.title}</h4>
+                  {project.data.year && <p class="date">{project.data.year}</p>}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </main>
+    <Footer />
+  </body>
 </html>

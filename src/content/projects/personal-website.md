@@ -1,12 +1,12 @@
 ---
-title: "Personal Website"
-description: "Modern, blazing-fast personal website built with Astro, deployed via Docker to homelab with SWAG routing."
-link: "https://aaronbrazier.com"
-repo: "https://github.com/runonyourown/personal-site"
+title: 'Personal Website'
+description: 'Modern, blazing-fast personal website built with Astro, deployed via Docker to homelab with SWAG routing.'
+link: 'https://aaronbrazier.com'
+repo: 'https://github.com/runonyourown/personal-site'
 year: 2025
-tags: ["Astro", "TypeScript", "Tailwind CSS", "Docker", "Homelab", "CI/CD"]
+tags: ['Astro', 'TypeScript', 'Tailwind CSS', 'Docker', 'Homelab', 'CI/CD']
 featured: true
-status: "in-progress"
+status: 'in-progress'
 ---
 
 This is my personal website built with modern web technologies. It showcases my portfolio, blog posts, and projects while maintaining excellent performance and developer experience.

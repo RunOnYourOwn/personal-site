@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   personal-site:
@@ -6,13 +6,13 @@ services:
     container_name: personal-site
     restart: unless-stopped
     ports:
-      - "80:80"
+      - '80:80'
     networks:
       - proxy
     environment:
       - NODE_ENV=production
     labels:
-      - "swag.enable=true"
+      - 'swag.enable=true'
 
 networks:
   proxy:

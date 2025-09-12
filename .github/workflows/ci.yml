@@ -1,0 +1,180 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    name: Test and Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run astro check
+
+      - name: Build site
+        run: npm run build
+
+      - name: Test build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build failed - dist directory not found"
+            exit 1
+          fi
+          echo "Build successful - dist directory created"
+
+  build:
+    name: Build Docker Image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: buildx-${{ github.sha }}
+          restore-keys: |
+            buildx-
+
+      - name: Build image (local)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: personal-site:ci
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      - name: Save image
+        run: docker save personal-site:ci -o personal-site-image.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: personal-site-image
+          path: personal-site-image.tar
+
+  test-container:
+    name: Test Container
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: personal-site-image
+
+      - name: Load image
+        run: docker load -i personal-site-image.tar
+
+      - name: Test Container
+        run: |
+          # Start the container
+          docker run -d --name test-personal-site -p 8080:80 personal-site:ci
+
+          # Wait for container to start
+          sleep 10
+
+          # Check if container is running
+          docker ps | grep test-personal-site
+
+          # Test health endpoint
+          echo "Testing health endpoint..."
+          curl -f http://localhost:8080/healthz || echo "Health endpoint test failed"
+
+          # Test main page
+          echo "Testing main page..."
+          curl -f http://localhost:8080/ || echo "Main page test failed"
+
+          # Test blog page
+          echo "Testing blog page..."
+          curl -f http://localhost:8080/blog/ || echo "Blog page test failed"
+
+          # Test projects page
+          echo "Testing projects page..."
+          curl -f http://localhost:8080/projects/ || echo "Projects page test failed"
+
+          # Clean up
+          docker stop test-personal-site
+          docker rm test-personal-site
+
+      - name: Security Scan
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.48.0
+          echo "Scanning image for vulnerabilities..."
+          trivy image --severity HIGH,CRITICAL personal-site:ci || echo "Vulnerabilities found in image"
+
+  publish:
+    name: Publish to GHCR
+    needs: test-container
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/runonyourown/personal-site:latest
+            ghcr.io/runonyourown/personal-site:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      - name: Trigger Portainer Webhook
+        if: env.PORTAINER_WEBHOOK_URL != ''
+        run: |
+          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" || echo "Portainer webhook failed"
+        env:
+          PORTAINER_WEBHOOK_URL: ${{ secrets.PORTAINER_WEBHOOK_URL }}

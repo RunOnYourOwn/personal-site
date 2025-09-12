@@ -2,8 +2,22 @@
 // Dark mode toggle component
 ---
 
-<button id="dark-mode-toggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
-  <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<button
+  id="dark-mode-toggle"
+  class="dark-mode-toggle"
+  aria-label="Toggle dark mode"
+>
+  <svg
+    class="sun-icon"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
     <circle cx="12" cy="12" r="5"></circle>
     <line x1="12" y1="1" x2="12" y2="3"></line>
     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -14,7 +28,17 @@
     <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
   </svg>
-  <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg
+    class="moon-icon"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
   </svg>
 </button>
@@ -24,11 +48,11 @@
   function initDarkMode() {
     const toggle = document.getElementById('dark-mode-toggle');
     const html = document.documentElement;
-    
+
     // Toggle function
     toggle.addEventListener('click', () => {
       const isCurrentlyDark = html.classList.contains('dark');
-      
+
       if (isCurrentlyDark) {
         html.classList.remove('dark');
         localStorage.setItem('theme', 'light');
@@ -38,7 +62,7 @@
       }
     });
   }
-  
+
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initDarkMode);
@@ -60,36 +84,36 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .dark-mode-toggle:hover {
     background: rgba(var(--gray-light), 0.5);
     color: rgb(var(--black));
   }
-  
+
   .dark-mode-toggle:focus {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-  
+
   .sun-icon,
   .moon-icon {
     transition: opacity 0.2s ease;
   }
-  
+
   /* Default state - show sun icon (light mode) */
   .moon-icon {
     display: none;
   }
-  
+
   /* Dark mode state - show moon icon */
   :global(.dark) .sun-icon {
     display: none;
   }
-  
+
   :global(.dark) .moon-icon {
     display: block;
   }
-  
+
   @media (max-width: 720px) {
     .dark-mode-toggle {
       padding: 6px;

@@ -8,15 +8,17 @@ interface Props {
 const { class: className, href, ...props } = Astro.props;
 ---
 
-{href ? (
-  <a href={href} class={`card ${className || ''}`} {...props}>
-    <slot />
-  </a>
-) : (
-  <div class={`card ${className || ''}`} {...props}>
-    <slot />
-  </div>
-)}
+{
+  href ? (
+    <a href={href} class={`card ${className || ''}`} {...props}>
+      <slot />
+    </a>
+  ) : (
+    <div class={`card ${className || ''}`} {...props}>
+      <slot />
+    </div>
+  )
+}
 
 <style>
   .card {
