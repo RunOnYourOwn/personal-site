@@ -74,6 +74,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 
 <!-- Umami Analytics -->
 <script
+  is:inline
   defer
   src="http://localhost:3000/script.js"
   data-website-id="03a84fdf-2c45-4e21-a5f8-e9b01edd99a5"></script>
@@ -83,16 +84,32 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
-<!-- Open Graph / Facebook -->
+<!-- Enhanced Open Graph / Facebook / LinkedIn -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image.src, Astro.url)} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Aaron Brazier - Senior Data Scientist" />
+<meta property="og:site_name" content="Aaron Brazier" />
+<meta property="og:locale" content="en_US" />
 
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+<!-- Professional Profile Meta Tags -->
+<meta property="profile:first_name" content="Aaron" />
+<meta property="profile:last_name" content="Brazier" />
+<meta property="profile:username" content="aaronbrazier" />
+
+<!-- Business/Location Meta Tags -->
+<meta property="business:contact_data:locality" content="Valparaiso" />
+<meta property="business:contact_data:region" content="Indiana" />
+<meta property="business:contact_data:country_name" content="United States" />
+
+<!-- Professional Keywords -->
+<meta property="article:tag" content="Data Science" />
+<meta property="article:tag" content="Machine Learning" />
+<meta property="article:tag" content="Oil & Gas" />
+<meta property="article:tag" content="Python" />
+<meta property="article:tag" content="Azure" />
+<meta property="article:tag" content="Homelab" />

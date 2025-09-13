@@ -3,8 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import BlogCard from '../components/BlogCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import StructuredData from '../components/StructuredData.astro';
 import { getCollection } from 'astro:content';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SITE_TITLE } from '../consts';
 
 // Get latest blog posts and featured projects
 const allBlogPosts = await getCollection('blog');
@@ -22,7 +23,11 @@ const featuredProjects = allProjects
   .slice(0, 4);
 ---
 
-<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+<BaseLayout
+  title={SITE_TITLE}
+  description="Senior Data Scientist at BP specializing in oil & gas, machine learning model deployment, and full-stack data science solutions with extensive homelab infrastructure experience."
+>
+  <StructuredData type="website" data={{}} />
   <Hero />
 
   <main class="main-content">

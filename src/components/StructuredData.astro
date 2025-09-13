@@ -1,0 +1,167 @@
+---
+// Structured Data component for JSON-LD rich snippets
+interface Props {
+  type: 'person' | 'website' | 'article' | 'project';
+  data: {
+    title?: string;
+    description?: string;
+    url?: string;
+    pubDate?: string;
+    updated?: string;
+    tags?: string[];
+    year?: number;
+    wordCount?: number;
+  };
+}
+
+const { type, data } = Astro.props;
+
+// Base website data
+const websiteData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Aaron Brazier',
+  url: 'https://aaronbrazier.com',
+  description:
+    'Senior Data Scientist specializing in oil & gas, machine learning model deployment, and full-stack data science solutions',
+  author: {
+    '@type': 'Person',
+    name: 'Aaron Brazier',
+    url: 'https://aaronbrazier.com/about',
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://aaronbrazier.com/blog?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+// Person data for about page
+const personData = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Aaron Brazier',
+  jobTitle: 'Senior Data Scientist',
+  worksFor: {
+    '@type': 'Organization',
+    name: 'BP',
+    url: 'https://www.bp.com',
+  },
+  url: 'https://aaronbrazier.com',
+  sameAs: [
+    'https://github.com/abrazier',
+    'https://www.linkedin.com/in/aaronbrazier/',
+  ],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Valparaiso',
+    addressRegion: 'Indiana',
+    addressCountry: 'United States',
+  },
+  email: 'aaronbrazier@gmail.com',
+  telephone: '(419) 460-2593',
+  description:
+    'Senior Data Scientist at BP specializing in oil & gas analytics, machine learning model deployment, and full-stack data science solutions with extensive homelab infrastructure experience.',
+  knowsAbout: [
+    'Data Science',
+    'Machine Learning',
+    'Python',
+    'PyTorch',
+    'TensorFlow',
+    'Microsoft Azure',
+    'Docker',
+    'Time Series Analysis',
+    'Anomaly Detection',
+    'Oil & Gas',
+    'Homelab Infrastructure',
+  ],
+  alumniOf: [
+    {
+      '@type': 'CollegeOrUniversity',
+      name: 'Western Governors University',
+      degree:
+        'Bachelor of Science in Information Technology—Network Administration',
+    },
+    {
+      '@type': 'CollegeOrUniversity',
+      name: 'Trine University',
+      degree: 'Bachelor of Science in Civil Engineering',
+    },
+  ],
+};
+
+// Article data for blog posts
+const articleData = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: data.title,
+  description: data.description,
+  author: {
+    '@type': 'Person',
+    name: 'Aaron Brazier',
+    url: 'https://aaronbrazier.com/about',
+  },
+  publisher: {
+    '@type': 'Person',
+    name: 'Aaron Brazier',
+    url: 'https://aaronbrazier.com',
+  },
+  datePublished: data.pubDate,
+  dateModified: data.updated || data.pubDate,
+  url: data.url,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': data.url,
+  },
+  keywords:
+    data.tags?.join(', ') || 'Data Science, Machine Learning, Technology',
+  articleSection: 'Technology',
+  wordCount: data.wordCount || 500,
+};
+
+// Project data for project pages
+const projectData = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: data.title,
+  description: data.description,
+  author: {
+    '@type': 'Person',
+    name: 'Aaron Brazier',
+    url: 'https://aaronbrazier.com/about',
+  },
+  url: data.url,
+  dateCreated: data.year ? `${data.year}-01-01` : undefined,
+  keywords: data.tags?.join(', ') || 'Software Development, Technology',
+  programmingLanguage:
+    data.tags
+      ?.filter(tag =>
+        ['Python', 'JavaScript', 'TypeScript', 'Rust', 'Docker'].includes(tag)
+      )
+      .join(', ') || 'Python, JavaScript',
+};
+
+// Select the appropriate data based on type
+let structuredData;
+switch (type) {
+  case 'person':
+    structuredData = personData;
+    break;
+  case 'article':
+    structuredData = articleData;
+    break;
+  case 'project':
+    structuredData = projectData;
+    break;
+  case 'website':
+  default:
+    structuredData = websiteData;
+    break;
+}
+---
+
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify(structuredData)}
+/>
