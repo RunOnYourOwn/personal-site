@@ -145,6 +145,40 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
 
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # First release - get all commits
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits since previous tag
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges ${PREVIOUS_TAG}..HEAD)
+          fi
+
+          # Create release body
+          cat > release_body.md << EOF
+          ## Personal Site v${{ steps.version.outputs.version }}
+
+          ### Docker Images
+          - \`ghcr.io/runonyourown/personal-site:v${{ steps.version.outputs.version }}\`
+          - \`ghcr.io/runonyourown/personal-site:latest\`
+
+          ### Changes
+          $COMMITS
+
+          ### Deployment
+          This release is automatically deployed to production via Portainer webhook.
+          EOF
+
+          # Output the release body
+          echo "release_body<<EOF" >> $GITHUB_OUTPUT
+          cat release_body.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
@@ -152,18 +186,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Personal Site v${{ steps.version.outputs.version }}
-          body: |
-            ## Personal Site v${{ steps.version.outputs.version }}
-
-            ### Docker Images
-            - `ghcr.io/runonyourown/personal-site:v${{ steps.version.outputs.version }}`
-            - `ghcr.io/runonyourown/personal-site:latest`
-
-            ### Changes
-            See commit history for detailed changes.
-
-            ### Deployment
-            This release is automatically deployed to production via Portainer webhook.
+          body: ${{ steps.release_notes.outputs.release_body }}
           draft: false
           prerelease: false
 
