@@ -5,6 +5,10 @@ on:
     branches: [main]
   push:
     branches: [main]
+    paths-ignore:
+      - 'src/content/**'
+      - 'src/assets/**'
+      - 'public/**'
   workflow_dispatch:
 
 permissions:
