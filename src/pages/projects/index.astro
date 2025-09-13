@@ -44,9 +44,9 @@ const allTags = [
     <Header />
     <main class="projects-main">
       <!-- Hero Section -->
-      <section class="projects-hero">
+      <section class="projects-hero" aria-labelledby="projects-title">
         <div class="projects-hero-content">
-          <h1 class="projects-title">Projects</h1>
+          <h1 id="projects-title" class="projects-title">Projects</h1>
           <p class="projects-subtitle">
             A showcase of my development work and personal projects
           </p>
@@ -54,7 +54,10 @@ const allTags = [
       </section>
 
       <!-- Search & Filters Section -->
-      <section class="search-filters-section">
+      <section
+        class="search-filters-section"
+        aria-label="Search and filter projects"
+      >
         <div class="search-container">
           <Search
             placeholder="Search blog posts and projects..."

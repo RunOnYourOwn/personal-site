@@ -22,7 +22,11 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
   Astro.props;
 ---
 
-<div class="search-container">
+<div
+  class="search-container"
+  role="search"
+  aria-label="Search posts and projects"
+>
   <div class="search-input-wrapper">
     <input
       type="text"
@@ -30,6 +34,8 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
       class="search-input"
       placeholder={placeholder}
       autocomplete="off"
+      aria-label="Search input"
+      aria-describedby="search-results"
     />
     <div class="search-icon">
       <svg
@@ -44,7 +50,12 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
         <path d="m21 21-4.35-4.35"></path>
       </svg>
     </div>
-    <button id="search-clear" class="search-clear" style="display: none;">
+    <button
+      id="search-clear"
+      class="search-clear"
+      style="display: none;"
+      aria-label="Clear search"
+    >
       <svg
         width="16"
         height="16"
@@ -59,12 +70,29 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
     </button>
   </div>
 
-  <div id="search-results" class="search-results" style="display: none;">
+  <div
+    id="search-results"
+    class="search-results"
+    style="display: none;"
+    role="region"
+    aria-label="Search results"
+    aria-live="polite"
+  >
     <div class="search-results-header">
       <span id="search-count" class="search-count">0 results</span>
-      <button id="search-close" class="search-close">Close</button>
+      <button
+        id="search-close"
+        class="search-close"
+        aria-label="Close search results">Close</button
+      >
     </div>
-    <div id="search-results-list" class="search-results-list"></div>
+    <div
+      id="search-results-list"
+      class="search-results-list"
+      role="list"
+      aria-label="Search results list"
+    >
+    </div>
   </div>
 </div>
 
@@ -291,6 +319,13 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
+        searchInput.focus();
+      }
+
+      // Close search results with Escape key
+      if (e.key === 'Escape' && searchResults.style.display !== 'none') {
+        searchResults.style.display = 'none';
+        searchInput.value = '';
         searchInput.focus();
       }
     });

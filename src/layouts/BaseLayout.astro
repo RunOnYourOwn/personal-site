@@ -22,9 +22,30 @@ const { title, description, image } = Astro.props;
     <script>
       // Remove no-js class if JavaScript is enabled
       document.documentElement.classList.remove('no-js');
+
+      // Handle skip links
+      document.addEventListener('DOMContentLoaded', function () {
+        const skipLinks = document.querySelectorAll('.skip-link');
+        skipLinks.forEach(link => {
+          link.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              e.preventDefault();
+              targetElement.focus();
+              targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        });
+      });
     </script>
+
+    <!-- Skip links for keyboard navigation -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#site-navigation" class="skip-link">Skip to navigation</a>
+
     <Header />
-    <main>
+    <main id="main-content" role="main">
       <slot />
     </main>
     <Footer />
