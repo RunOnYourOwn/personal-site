@@ -1,48 +1,31 @@
 ---
 title: 'Homelab Infrastructure'
-description: 'Self-hosted infrastructure setup with Docker, Portainer, SWAG, and various services for learning and development.'
-year: 2024
+description: 'Comprehensive self-hosted infrastructure with 3-node Proxmox cluster, 250TB storage, and full automation pipeline.'
+year: 2025
 tags:
-  ['Docker', 'Portainer', 'SWAG', 'Self-hosting', 'Infrastructure', 'DevOps']
+  [
+    'Proxmox',
+    'Docker',
+    'Portainer',
+    'SWAG',
+    'Self-hosting',
+    'Infrastructure',
+    'DevOps',
+    'Automation',
+  ]
 featured: true
-status: 'completed'
+status: 'in-progress'
+heroImage: '../../assets/homeserver-rack.jpeg'
 ---
 
-My homelab infrastructure provides a robust foundation for self-hosting applications and learning about modern DevOps practices. The setup emphasizes security, automation, and scalability.
+## Coming Soon
 
-## Core Components
+Detailed documentation of my production-grade homelab infrastructure is coming soon. This will include:
 
-### Container Orchestration
+- **3-Node Proxmox Cluster**: Two Minisforum MS-01s and custom EPYC 7502P server
+- **250TB Storage**: TrueNAS, Unraid, and ZFS with 3-2-1 backup strategy
+- **Automation Pipeline**: Gitea, Renovate, Discord bots, and Portainer orchestration
+- **Home Automation**: Home Assistant, ZigBee, MQTT, and Z-Wave integration
+- **Monitoring**: Grafana dashboards and comprehensive infrastructure monitoring
 
-- **Docker**: Containerization platform for all services
-- **Portainer**: Web-based container management interface
-- **Docker Compose**: Multi-container application definitions
-
-### Networking & Security
-
-- **SWAG (Secure Web Application Gateway)**: Nginx reverse proxy with automatic SSL
-- **Cloudflare**: DNS management and DDoS protection
-- **Fail2ban**: Intrusion prevention system
-
-### Monitoring & Logging
-
-- **Uptime Kuma**: Service monitoring and status pages
-- **Grafana**: Metrics visualization and dashboards
-- **Prometheus**: Metrics collection and alerting
-
-## Services Hosted
-
-- **Personal Website**: Astro-based portfolio site
-- **Git Server**: Self-hosted Git repositories
-- **Password Manager**: Bitwarden for secure credential storage
-- **Media Server**: Jellyfin for media streaming
-- **File Sync**: Nextcloud for file synchronization
-- **Development Tools**: Various development and testing environments
-
-## Benefits
-
-- **Cost Effective**: Reduced reliance on cloud services
-- **Learning**: Hands-on experience with modern infrastructure
-- **Control**: Full control over data and services
-- **Privacy**: Self-hosted solutions for sensitive data
-- **Automation**: CI/CD pipelines for automated deployments
+This infrastructure serves as my local AI processing hub and development environment, mirroring professional DevOps workflows with automated CI/CD pipelines.

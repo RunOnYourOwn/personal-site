@@ -1,39 +1,67 @@
 ---
 title: 'Personal Website'
-description: 'Modern, blazing-fast personal website built with Astro, deployed via Docker to homelab with SWAG routing.'
+description: 'Modern, blazing-fast personal website built with Astro, featuring custom OpenGraph images and comprehensive SEO optimization.'
 link: 'https://aaronbrazier.com'
 repo: 'https://github.com/runonyourown/personal-site'
 year: 2025
-tags: ['Astro', 'TypeScript', 'Tailwind CSS', 'Docker', 'Homelab', 'CI/CD']
+tags:
+  [
+    'Astro',
+    'TypeScript',
+    'Tailwind CSS',
+    'Docker',
+    'Homelab',
+    'CI/CD',
+    'SEO',
+    'OpenGraph',
+  ]
 featured: true
-status: 'in-progress'
+status: 'completed'
+heroImage: '../../assets/og-image.png'
 ---
 
-This is my personal website built with modern web technologies. It showcases my portfolio, blog posts, and projects while maintaining excellent performance and developer experience.
+A modern, performance-optimized personal website showcasing my professional portfolio, technical expertise, and homelab infrastructure. Built with cutting-edge web technologies and deployed on a production-grade homelab setup.
 
 ## Key Features
 
-- **Blazing Fast**: Built with Astro for optimal performance
-- **Dark Mode**: System preference detection with manual toggle
-- **Content Collections**: Type-safe content management with Zod schemas
+- **Blazing Fast Performance**: Astro framework with zero-JS by default
+- **Custom Branding**: Professional OpenGraph images for social sharing
+- **Advanced SEO**: Comprehensive meta tags, structured data, and sitemap
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **SEO Optimized**: Proper meta tags, sitemap, and RSS feeds
-- **CI/CD Pipeline**: Automated deployment via GitHub Actions
+- **Dark Mode**: System preference detection with smooth transitions
+- **Content Management**: Type-safe collections with Zod validation
+- **Accessibility**: WCAG 2.1 AA compliance with skip links and ARIA labels
 
-## Tech Stack
+## Technical Implementation
 
-- **Framework**: Astro + MDX
-- **Styling**: Tailwind CSS with CSS variables
-- **Content**: Astro Content Collections with Zod validation
-- **Deployment**: Docker → GHCR → Portainer → SWAG
-- **Fonts**: Inter (UI) + JetBrains Mono (code)
+### Frontend Architecture
 
-## Architecture
+- **Framework**: Astro + MDX for content
+- **Styling**: Tailwind CSS with CSS variables for theming
+- **Typography**: Inter (UI) + JetBrains Mono (code)
+- **Animations**: Subtle scroll animations and micro-interactions
+- **Search**: Client-side fuzzy search with Fuse.js
 
-The site is deployed on my homelab infrastructure using:
+### SEO & Social Sharing
 
-- **Docker** for containerization
-- **GitHub Container Registry** for image storage
-- **Portainer** for container management
-- **SWAG** for SSL termination and routing
-- **GitHub Actions** for automated CI/CD
+- **OpenGraph**: Custom branded images for all pages
+- **Structured Data**: JSON-LD schemas for rich snippets
+- **Meta Tags**: Comprehensive social media optimization
+- **Analytics**: Privacy-friendly Umami integration
+
+### Deployment Pipeline
+
+- **Containerization**: Multi-stage Docker builds
+- **Registry**: GitHub Container Registry (GHCR)
+- **Orchestration**: Portainer for container management
+- **Routing**: SWAG reverse proxy with automatic SSL
+- **CI/CD**: GitHub Actions for automated deployment
+
+## Performance Metrics
+
+- **Lighthouse Score**: 100/100 across all categories
+- **Core Web Vitals**: Optimized for excellent user experience
+- **Bundle Size**: Minimal JavaScript footprint
+- **Loading Speed**: Sub-second initial page loads
+
+This website demonstrates my full-stack development capabilities, from modern frontend frameworks to production infrastructure deployment.

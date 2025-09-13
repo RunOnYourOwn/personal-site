@@ -2,6 +2,7 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -27,7 +28,7 @@ const { Content } = await project.render();
   <body>
     <Header />
     <main>
-      <article>
+      <article class="project-article">
         <div class="project-header">
           <div class="project-meta">
             {project.data.year && <span class="year">{project.data.year}</span>}
@@ -70,6 +71,19 @@ const { Content } = await project.render();
           </div>
         </div>
 
+        {
+          project.data.heroImage && (
+            <div class="project-hero-image">
+              <Image
+                src={project.data.heroImage}
+                alt={`${project.data.title} - Project Overview`}
+                width={1200}
+                height={600}
+              />
+            </div>
+          )
+        }
+
         <div class="content">
           <Content />
         </div>
@@ -80,10 +94,19 @@ const { Content } = await project.render();
 </html>
 
 <style>
+  .project-article {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
   .project-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
+    margin-bottom: 4rem;
+    padding-bottom: 3rem;
     border-bottom: 1px solid rgb(var(--gray-light));
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .project-meta {
@@ -192,34 +215,48 @@ const { Content } = await project.render();
     font-weight: 500;
   }
 
+  .project-hero-image {
+    margin: 3rem 0;
+    text-align: center;
+  }
+
+  .project-hero-image img {
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .project-hero-image img:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  }
+
   .content {
-    line-height: 1.7;
-  }
-
-  .content h2 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: rgb(var(--black));
-  }
-
-  .content h3 {
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    color: rgb(var(--black));
+    line-height: 1.8;
+    max-width: 65ch;
+    margin: 0 auto;
+    font-size: 1.125rem;
   }
 
   .content p {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    line-height: 1.8;
   }
 
   .content ul,
   .content ol {
-    margin-bottom: 1.5rem;
-    padding-left: 2rem;
+    margin-bottom: 2rem;
+    padding-left: 2.5rem;
   }
 
   .content li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
   }
 
   .content code {
@@ -256,9 +293,9 @@ const { Content } = await project.render();
     color: rgb(209, 213, 219);
   }
 
-  :global(.dark) .content h2,
-  :global(.dark) .content h3 {
-    color: rgb(255, 255, 255);
+  :global(.dark) .project-article .content h2,
+  :global(.dark) .project-article .content h3 {
+    color: rgb(255, 255, 255) !important;
   }
 
   :global(.dark) .content code {

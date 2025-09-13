@@ -99,7 +99,6 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
 <script is:inline define:vars={{ searchData }}>
   // Check if search data is available
   if (!searchData || searchData.length === 0) {
-    console.error('No search data available');
     return;
   }
 
@@ -116,7 +115,6 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
       script.src = '/fuse.min.js';
 
       script.onload = function () {
-        console.log('Fuse.js loaded successfully from local file');
         if (window.Fuse) {
           resolve(window.Fuse);
         } else {
@@ -125,7 +123,6 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
       };
 
       script.onerror = function () {
-        console.error('Failed to load Fuse.js from local file');
         reject(new Error('Failed to load Fuse.js from local file'));
       };
 
@@ -153,12 +150,9 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
         // Initialize Fuse
         const fuse = new Fuse(searchData, fuseOptions);
         initializeSearch(fuse);
-      } catch (error) {
-        console.error('Error initializing Fuse:', error);
-      }
+      } catch (error) {}
     })
     .catch(error => {
-      console.error('Failed to load Fuse.js:', error);
       // Show error message to user
       const searchInput = document.getElementById('search-input');
       if (searchInput) {

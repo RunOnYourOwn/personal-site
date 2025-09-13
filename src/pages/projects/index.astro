@@ -533,26 +533,15 @@ const allTags = [
 
   // Initialize scroll animations for this page
   function initPageScrollAnimations() {
-    console.log('Projects page: Initializing scroll animations');
-
     // First, ensure all elements start hidden
     const elements = document.querySelectorAll('.scroll-animate');
-    console.log(
-      'Projects page: Found scroll-animate elements:',
-      elements.length
-    );
 
     elements.forEach(element => {
       // Remove any existing animate-in class and ensure element is hidden
       element.classList.remove('animate-in');
-      console.log('Projects page: Reset element:', element);
     });
 
     if (!('IntersectionObserver' in window)) {
-      console.log(
-        'No IntersectionObserver, showing elements immediately:',
-        elements.length
-      );
       elements.forEach(element => {
         element.classList.add('animate-in');
       });
@@ -565,7 +554,6 @@ const allTags = [
         entries => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              console.log('Projects page: Element animating in:', entry.target);
               entry.target.classList.add('animate-in');
               observer.unobserve(entry.target);
             }
@@ -578,7 +566,6 @@ const allTags = [
       );
 
       elements.forEach(element => {
-        console.log('Projects page: Observing element:', element);
         observer.observe(element);
       });
     }, 100);

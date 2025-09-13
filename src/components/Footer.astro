@@ -1,5 +1,6 @@
 ---
 // Footer component with social links and copyright
+import { getSiteVersion } from '../consts';
 ---
 
 <footer class="footer" role="contentinfo">
@@ -98,6 +99,9 @@
         rel="noopener noreferrer">Astro</a
       > and deployed with Docker.
     </p>
+    <p class="version-info">
+      Site version: <span class="version-number">v{getSiteVersion()}</span>
+    </p>
   </div>
 </footer>
 
@@ -190,6 +194,18 @@
     text-decoration: underline;
   }
 
+  .version-info {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin: 0.25rem 0 0 0;
+  }
+
+  .version-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
   /* Dark mode styles */
   :global(.dark) .footer {
     background: rgb(17, 24, 39);
@@ -213,6 +229,14 @@
   :global(.dark) .footer-bottom {
     border-top-color: rgb(55, 65, 81);
     color: rgb(156, 163, 175);
+  }
+
+  :global(.dark) .version-info {
+    color: rgb(107, 114, 128);
+  }
+
+  :global(.dark) .version-number {
+    color: var(--accent);
   }
 
   /* Responsive design */
