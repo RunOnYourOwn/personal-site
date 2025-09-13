@@ -230,23 +230,15 @@ const featuredProjects = allProjects
   <script>
     // Initialize scroll animations for homepage
     function initHomepageScrollAnimations() {
-      console.log('Homepage: Initializing scroll animations');
-
       // First, ensure all elements start hidden
       const elements = document.querySelectorAll('.scroll-animate');
-      console.log('Homepage: Found scroll-animate elements:', elements.length);
 
       elements.forEach(element => {
         // Remove any existing animate-in class and ensure element is hidden
         element.classList.remove('animate-in');
-        console.log('Homepage: Reset element:', element);
       });
 
       if (!('IntersectionObserver' in window)) {
-        console.log(
-          'No IntersectionObserver, showing elements immediately:',
-          elements.length
-        );
         elements.forEach(element => {
           element.classList.add('animate-in');
         });
@@ -259,7 +251,6 @@ const featuredProjects = allProjects
           entries => {
             entries.forEach(entry => {
               if (entry.isIntersecting) {
-                console.log('Homepage: Element animating in:', entry.target);
                 entry.target.classList.add('animate-in');
                 observer.unobserve(entry.target);
               }
@@ -272,7 +263,6 @@ const featuredProjects = allProjects
         );
 
         elements.forEach(element => {
-          console.log('Homepage: Observing element:', element);
           observer.observe(element);
         });
       }, 100);

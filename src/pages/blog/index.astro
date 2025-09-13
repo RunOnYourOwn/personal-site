@@ -514,23 +514,15 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
 
   // Initialize scroll animations for this page
   function initPageScrollAnimations() {
-    console.log('Blog page: Initializing scroll animations');
-
     // First, ensure all elements start hidden
     const elements = document.querySelectorAll('.scroll-animate');
-    console.log('Blog page: Found scroll-animate elements:', elements.length);
 
     elements.forEach(element => {
       // Remove any existing animate-in class and ensure element is hidden
       element.classList.remove('animate-in');
-      console.log('Blog page: Reset element:', element);
     });
 
     if (!('IntersectionObserver' in window)) {
-      console.log(
-        'No IntersectionObserver, showing elements immediately:',
-        elements.length
-      );
       elements.forEach(element => {
         element.classList.add('animate-in');
       });
@@ -543,7 +535,6 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
         entries => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              console.log('Blog page: Element animating in:', entry.target);
               entry.target.classList.add('animate-in');
               observer.unobserve(entry.target);
             }
@@ -556,7 +547,6 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
       );
 
       elements.forEach(element => {
-        console.log('Blog page: Observing element:', element);
         observer.observe(element);
       });
     }, 100);
