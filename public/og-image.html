@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenGraph Image - Aaron Brazier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            width: 1200px;
+            height: 630px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            max-width: 1000px;
+            padding: 2rem;
+        }
+
+        .text-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .image-content {
+            flex: 0 0 280px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #3b82f6;
+            border-radius: 2rem;
+            padding: 0.75rem 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .profile-photo {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .badge-icon {
+            font-size: 1.25rem;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .title-about {
+            color: #3b82f6;
+        }
+
+        .title-name {
+            background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #e2e8f0;
+            font-weight: 400;
+            line-height: 1.4;
+            max-width: 500px;
+        }
+
+        /* Decorative elements */
+        .content::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .content::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #10b981, #f59e0b);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <div class="text-content">
+            <div class="badge">
+                <span class="badge-icon">👨‍💻</span>
+                <span class="badge-text">SENIOR DATA SCIENTIST</span>
+            </div>
+            
+            <h1 class="title">
+                <span class="title-about">About </span>
+                <span class="title-name">Aaron Brazier</span>
+            </h1>
+            
+            <p class="subtitle">
+                Senior Data Scientist specializing in oil & gas, machine learning model deployment, and full-stack data science solutions.
+            </p>
+        </div>
+        
+        <div class="image-content">
+            <img src="/images/profile-photo.jpeg" alt="Aaron Brazier" class="profile-photo" />
+        </div>
+    </div>
+</body>
+</html>
