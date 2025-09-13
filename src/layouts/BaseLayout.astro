@@ -23,8 +23,31 @@ const { title, description, image } = Astro.props;
       // Remove no-js class if JavaScript is enabled
       document.documentElement.classList.remove('no-js');
 
+      // Fix mobile scrolling issues
+      function fixMobileScrolling() {
+        // Force reflow to ensure proper height calculation
+        document.body.style.height = 'auto';
+        document.documentElement.style.height = 'auto';
+
+        // Set proper viewport height for mobile
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+        // Ensure body can scroll
+        document.body.style.overflowY = 'auto';
+        document.documentElement.style.overflowY = 'auto';
+      }
+
       // Handle skip links
       document.addEventListener('DOMContentLoaded', function () {
+        // Fix mobile scrolling on page load
+        fixMobileScrolling();
+
+        // Fix mobile scrolling on resize
+        window.addEventListener('resize', fixMobileScrolling);
+        window.addEventListener('orientationchange', function () {
+          setTimeout(fixMobileScrolling, 100);
+        });
         const skipLinks = document.querySelectorAll('.skip-link');
         skipLinks.forEach(link => {
           link.addEventListener('click', e => {

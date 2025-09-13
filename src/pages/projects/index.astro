@@ -583,10 +583,31 @@ const allTags = [
     }, 100);
   }
 
+  // Fix mobile scrolling issues
+  function fixMobilePageScrolling() {
+    // Ensure the page can scroll on mobile
+    document.body.style.overflowY = 'auto';
+    document.documentElement.style.overflowY = 'auto';
+
+    // Force a reflow to ensure proper height calculation
+    document.body.offsetHeight;
+
+    // Ensure main content area is scrollable
+    const main = document.querySelector('main');
+    if (main) {
+      main.style.minHeight = '100vh';
+      main.style.overflowY = 'visible';
+    }
+  }
+
   // Initialize when page loads
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPageScrollAnimations);
+    document.addEventListener('DOMContentLoaded', function () {
+      fixMobilePageScrolling();
+      initPageScrollAnimations();
+    });
   } else {
+    fixMobilePageScrolling();
     initPageScrollAnimations();
   }
 </script>
