@@ -4,6 +4,7 @@ import Hero from '../components/Hero.astro';
 import BlogCard from '../components/BlogCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import StructuredData from '../components/StructuredData.astro';
+import ProfileImage from '../assets/profile-photo.jpeg';
 import { getCollection } from 'astro:content';
 import { SITE_TITLE } from '../consts';
 
@@ -26,6 +27,7 @@ const featuredProjects = allProjects
 <BaseLayout
   title={SITE_TITLE}
   description="Senior Data Scientist at BP specializing in oil & gas, machine learning model deployment, and full-stack data science solutions with extensive homelab infrastructure experience."
+  image={ProfileImage}
 >
   <StructuredData type="website" data={{}} />
   <Hero />
