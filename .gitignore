@@ -28,3 +28,5 @@ CONTENT_GUIDE.md
 test-production-domain.sh
 DEPLOYMENT_GUIDE.md
 DEPLOYMENT.md
+
+umami-db-data/

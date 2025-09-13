@@ -60,6 +60,12 @@ import DarkModeToggle from './DarkModeToggle.astro';
     transition:
       background 0.3s ease,
       box-shadow 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
   }
 
   :global(.dark) header {
@@ -96,6 +102,8 @@ import DarkModeToggle from './DarkModeToggle.astro';
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: nowrap;
+    min-height: 60px;
   }
   nav a {
     padding: 1em 0.5em;
@@ -117,8 +125,54 @@ import DarkModeToggle from './DarkModeToggle.astro';
     display: flex;
   }
   @media (max-width: 720px) {
+    header {
+      padding: 0 0.75em;
+    }
+
+    nav {
+      min-height: 60px;
+    }
+
+    h2 {
+      font-size: 0.9em;
+      flex-shrink: 0;
+    }
+
+    .internal-links {
+      display: flex;
+      gap: 0.25em;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    .internal-links a {
+      padding: 0.75em 0.25em;
+      font-size: 0.85em;
+      white-space: nowrap;
+    }
+
+    .header-controls {
+      gap: 0.25em;
+      flex-shrink: 0;
+    }
+
     .social-links {
       display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    header {
+      padding: 0 0.5em;
+    }
+
+    h2 {
+      font-size: 0.8em;
+    }
+
+    .internal-links a {
+      padding: 0.5em 0.15em;
+      font-size: 0.8em;
     }
   }
 </style>
