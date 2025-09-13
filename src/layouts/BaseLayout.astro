@@ -27,13 +27,17 @@ const { title, description, image } = Astro.props;
       document.addEventListener('DOMContentLoaded', function () {
         const skipLinks = document.querySelectorAll('.skip-link');
         skipLinks.forEach(link => {
-          link.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-              e.preventDefault();
-              targetElement.focus();
-              targetElement.scrollIntoView({ behavior: 'smooth' });
+          link.addEventListener('click', e => {
+            const targetId = (link as HTMLAnchorElement)
+              .getAttribute('href')
+              ?.substring(1);
+            if (targetId) {
+              const targetElement = document.getElementById(targetId);
+              if (targetElement) {
+                e.preventDefault();
+                targetElement.focus();
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+              }
             }
           });
         });
