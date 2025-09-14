@@ -10,7 +10,8 @@ services:
     networks:
       - proxy
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
+      - UMAMI_URL=https://umami.yourdomain.com
     labels:
       - 'swag.enable=true'
 
