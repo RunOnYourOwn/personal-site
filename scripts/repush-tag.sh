@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Re-push latest tag script for TurfTrack
+# Re-push latest tag script for Personal Site
 # Usage: ./scripts/repush-tag.sh [tag_name]
-# Run this to re-push a tag to all remotes
+# Run this to delete and re-create a tag, then push it to all remotes
 
 set -e
 
@@ -51,33 +51,64 @@ validate_tag() {
     fi
 }
 
-# Function to re-push tag
+# Function to delete and re-create tag
 repush_tag() {
     local tag_name=$1
     
-    print_info "Re-pushing tag '$tag_name' to all remotes..."
+    print_info "Re-creating tag '$tag_name'..."
     
     # Check if working directory is clean
     if [ -n "$(git status --porcelain)" ]; then
-        print_warning "Working directory is not clean, but continuing with tag push..."
+        print_warning "Working directory is not clean, but continuing with tag operations..."
     fi
     
-    # Push tag to all remotes
+    # Step 1: Delete local tag
+    print_info "1. Deleting local tag '$tag_name'..."
+    if git tag -d "$tag_name" 2>/dev/null; then
+        print_success "   ✓ Local tag deleted"
+    else
+        print_warning "   ! Local tag '$tag_name' not found (may have been deleted already)"
+    fi
+    
+    # Step 2: Delete remote tag
+    print_info "2. Deleting remote tag '$tag_name'..."
+    local delete_success=true
+    for remote in $(git remote); do
+        print_info "   -> Deleting from '$remote'"
+        if git push "$remote" ":refs/tags/$tag_name" 2>/dev/null; then
+            print_success "     ✓ Successfully deleted from $remote"
+        else
+            print_warning "     ! Failed to delete from $remote (may not exist)"
+        fi
+    done
+    
+    # Step 3: Re-create tag
+    print_info "3. Re-creating tag '$tag_name'..."
+    if git tag -a "$tag_name" -m "Release $tag_name - Re-created tag"; then
+        print_success "   ✓ Tag re-created locally"
+    else
+        print_error "   ✗ Failed to re-create tag"
+        exit 1
+    fi
+    
+    # Step 4: Push new tag
+    print_info "4. Pushing new tag '$tag_name' to all remotes..."
     local push_success=true
     for remote in $(git remote); do
-        print_info "  -> Pushing tag '$tag_name' to '$remote'"
+        print_info "   -> Pushing to '$remote'"
         if git push "$remote" "$tag_name" 2>/dev/null; then
-            print_success "    ✓ Successfully pushed to $remote"
+            print_success "     ✓ Successfully pushed to $remote"
         else
-            print_error "    ✗ Failed to push to $remote"
+            print_error "     ✗ Failed to push to $remote"
             push_success=false
         fi
     done
     
     if [ "$push_success" = true ]; then
-        print_success "Tag '$tag_name' successfully pushed to all remotes"
+        print_success "Tag '$tag_name' successfully re-created and pushed to all remotes"
+        print_info "This will trigger the CD pipeline to build and deploy new images"
     else
-        print_warning "Tag push completed with some failures"
+        print_warning "Tag re-creation completed with some push failures"
         print_info "You may need to check remote permissions or network connectivity"
         exit 1
     fi
