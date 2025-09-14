@@ -25,6 +25,18 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# Cursor IDE files
+.cursor/
+
+# Scripts directory (build/utility scripts)
+scripts/
+
+# Additional cache and temporary files
+*.cache
+*.tmp
+*.log
+.cache/
+
 IMPLEMENTATION_PLAN.md
 CONTENT_GUIDE.md
 test-production-domain.sh
