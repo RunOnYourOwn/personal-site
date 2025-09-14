@@ -73,12 +73,17 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
-<!-- Umami Analytics -->
-<script
-  is:inline
-  defer
-  src="http://192.168.1.25:3000/script.js"
-  data-website-id="72e038c1-160d-4095-bb07-53ff122d7661"></script>
+<!-- Umami Analytics - Only in production -->
+{
+  import.meta.env.PROD && (
+    <script
+      is:inline
+      defer
+      src="https://umami.aaronbrazier.com/script.js"
+      data-website-id="72e038c1-160d-4095-bb07-53ff122d7661"
+    />
+  )
+}
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
