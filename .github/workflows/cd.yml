@@ -70,8 +70,8 @@ jobs:
 
       - name: Test Container
         run: |
-          # Start the container
-          docker run -d --name test-personal-site -p 8080:80 personal-site:ci
+          # Start the container with environment variables
+          docker run -d --name test-personal-site -p 8080:80 -e UMAMI_URL=https://umami.aaronbrazier.com personal-site:ci
 
           # Wait for container to start
           sleep 10

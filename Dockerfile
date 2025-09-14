@@ -30,6 +30,9 @@ RUN apk add --no-cache wget
 # Copy custom nginx configuration template
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
+# Set default environment variable for nginx template
+ENV UMAMI_URL=https://umami.aaronbrazier.com
+
 # Copy built site from build stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
