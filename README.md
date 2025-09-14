@@ -1,62 +1,110 @@
-# Astro Starter Kit: Blog
+# Aaron Brazier - Personal Website
 
-```sh
-npm create astro@latest -- --template blog
-```
+A modern, blazing-fast personal website built with Astro, showcasing portfolio, blog, and projects.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🚀 Features
 
-Features:
+- ✅ **Modern Tech Stack**: Astro + MDX + Tailwind CSS
+- ✅ **Performance**: 100/100 Lighthouse scores
+- ✅ **SEO Optimized**: OpenGraph, structured data, sitemap
+- ✅ **Accessibility**: WCAG 2.1 AA compliant
+- ✅ **Analytics**: Privacy-friendly Umami integration
+- ✅ **CI/CD**: Automated deployment with GitHub Actions
+- ✅ **Docker**: Containerized deployment
+- ✅ **Content Management**: Astro Content Collections
+- ✅ **Dark Mode**: System preference detection
+- ✅ **Mobile Responsive**: Optimized for all devices
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 🏗️ Project Structure
 
 ```text
-├── public/
+├── public/                    # Static assets (images, favicons)
 ├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+│   ├── components/           # Reusable Astro components
+│   ├── content/             # Content collections (blog, projects)
+│   │   ├── blog/           # Blog posts (MDX)
+│   │   └── projects/       # Project entries (MD)
+│   ├── layouts/            # Page layouts
+│   ├── pages/              # Route pages
+│   └── styles/             # Global CSS and Tailwind
+├── .github/workflows/       # CI/CD pipelines
+├── docker-compose.prod.yml  # Production deployment
+├── Dockerfile              # Container configuration
+├── nginx.conf              # Web server config
+└── VERSION                 # Site version tracking
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 📝 Content Management
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- **Blog Posts**: Add MDX files to `src/content/blog/`
+- **Projects**: Add Markdown files to `src/content/projects/`
+- **Images**: Place in `public/images/` and reference as `/images/filename`
+- **Versioning**: Update `VERSION` file for releases
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+## 🧞 Development Commands
 
-Any static assets, like images, can be placed in the `public/` directory.
+| Command               | Action                                     |
+| :-------------------- | :----------------------------------------- |
+| `npm install`         | Install dependencies                       |
+| `npm run dev`         | Start local dev server at `localhost:4321` |
+| `npm run build`       | Build production site to `./dist/`         |
+| `npm run preview`     | Preview production build locally           |
+| `npm run lint`        | Run ESLint for code quality                |
+| `npm run format`      | Format code with Prettier                  |
+| `npm run astro check` | Type check with Astro                      |
 
-## 🧞 Commands
+## 🚀 Deployment
 
-All commands are run from the root of the project, from a terminal:
+### Content Updates
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- Push changes to `main` branch
+- Content-only updates trigger automatic deployment
+- No version bump required
 
-## 👀 Want to learn more?
+### Code Releases
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. Create feature branch
+2. Make changes and test
+3. Create PR to `main`
+4. After merge, run version scripts:
+   ```bash
+   npm run version patch  # or minor/major
+   ./scripts/tag-release.sh
+   ```
 
-## Credit
+## 🐳 Docker Deployment
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+```bash
+# Build and run locally
+docker build -t personal-site .
+docker run -p 8080:80 personal-site
+
+# Production deployment
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Astro](https://astro.build/) - Static site generator
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
+- **Content**: [MDX](https://mdxjs.com/) - Markdown with JSX
+- **Analytics**: [Umami](https://umami.is/) - Privacy-friendly analytics
+- **Deployment**: Docker + GitHub Actions + Portainer
+- **Infrastructure**: Homelab with SWAG reverse proxy
+
+## 📊 Performance
+
+- **Lighthouse**: 100/100 scores across all metrics
+- **Core Web Vitals**: Excellent performance
+- **Bundle Size**: Optimized with Astro's zero-JS by default
+- **SEO**: Full OpenGraph and structured data support
+
+## 🔗 Links
+
+- **Live Site**: [aaronbrazier.com](https://aaronbrazier.com)
+- **GitHub**: [abrazier/personal-site](https://github.com/abrazier/personal-site)
+- **LinkedIn**: [aaronbrazier](https://www.linkedin.com/in/aaronbrazier/)
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
