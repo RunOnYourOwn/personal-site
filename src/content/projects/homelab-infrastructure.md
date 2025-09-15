@@ -71,8 +71,6 @@ The foundation of my homelab is a solid network setup that keeps everything conn
 
 <div>
 
-- Radarr
-- Sonarr
 - Swag
 - Tautulli
 - Transmission
@@ -215,8 +213,6 @@ I run a 3-node cluster that keeps everything highly available and distributes th
 ### Media & Entertainment
 
 - **Plex Media Server** - Streams all my media to any device
-- **Overseerr** - Handles media requests from family and friends
-- **Sonarr/Radarr** - Automatically downloads and organizes my media
 - **Tautulli** - Tracks Plex usage and analytics
 
 ### Development & AI
