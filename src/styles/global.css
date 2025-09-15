@@ -281,10 +281,17 @@ body {
   color: rgb(var(--gray-dark));
 }
 main {
-  width: 720px;
-  max-width: calc(100% - 2em);
+  width: 100%;
+  max-width: 1400px;
   margin: auto;
   padding: 3em 1em;
+}
+
+/* Wider layout for large screens */
+@media (min-width: 1600px) {
+  main {
+    max-width: 1600px;
+  }
 }
 /* Modern Typography Scale */
 h1,
@@ -327,20 +334,24 @@ h3 {
 
 /* Project page specific styles */
 .project-article .content h2 {
-  margin-top: 4rem !important;
-  margin-bottom: 2rem !important;
-  font-size: 1.875rem !important;
-  font-weight: 700;
+  border-bottom: 3px solid var(--accent) !important;
+  padding: 1rem 0 !important;
+  margin: 3rem 0 2rem 0 !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: var(--accent) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
   line-height: 1.3;
 }
 
 .project-article .content h2:first-of-type {
-  margin-top: 5rem !important;
+  margin-top: 2rem !important;
 }
 
 .project-article .content h3 {
-  margin-top: 3.5rem !important;
-  margin-bottom: 1.5rem !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
   font-size: 1.5rem !important;
   font-weight: 600;
   line-height: 1.4;
@@ -816,4 +827,81 @@ hr {
   clip-path: inset(50%);
   /* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
   white-space: nowrap;
+}
+
+/* Homelab diagram styling */
+.diagram-container {
+  position: relative;
+  margin: 2rem 0;
+  text-align: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  padding: 1rem;
+  box-shadow: var(--box-shadow);
+}
+
+.homelab-diagram {
+  width: 100%;
+  max-width: 1400px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.homelab-diagram:hover {
+  transform: scale(1.01);
+}
+
+/* Responsive design for homelab diagram */
+@media (max-width: 1024px) {
+  .homelab-diagram {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .diagram-container {
+    margin: 1rem 0;
+    padding: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .homelab-diagram {
+    min-width: 800px; /* Force horizontal scroll on mobile */
+  }
+}
+
+/* SVG text contrast fixes for light/dark mode */
+.diagram-container svg text,
+.diagram-container svg tspan,
+.diagram-container svg .text,
+.diagram-container svg [class*='text'],
+.diagram-container svg [fill*='white'],
+.diagram-container svg [fill*='#fff'],
+.diagram-container svg [fill*='lightgray'],
+.diagram-container svg [fill*='lightgrey'] {
+  fill: #1f2937 !important; /* Dark gray for light mode */
+  color: #1f2937 !important;
+}
+
+/* Dark mode adjustments */
+.dark .diagram-container {
+  background: var(--gray-dark);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark .diagram-container svg text,
+.dark .diagram-container svg tspan,
+.dark .diagram-container svg .text,
+.dark .diagram-container svg [class*='text'],
+.dark .diagram-container svg [fill*='white'],
+.dark .diagram-container svg [fill*='#fff'],
+.dark .diagram-container svg [fill*='lightgray'],
+.dark .diagram-container svg [fill*='lightgrey'] {
+  fill: #f9fafb !important; /* Light gray for dark mode */
+  color: #f9fafb !important;
 }

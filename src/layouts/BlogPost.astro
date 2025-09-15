@@ -34,11 +34,18 @@ const readingTime = 5; // Default fallback
         box-shadow: var(--box-shadow);
       }
       .prose {
-        width: 720px;
-        max-width: calc(100% - 2em);
+        width: 100%;
+        max-width: 900px;
         margin: auto;
         padding: 1em;
         color: rgb(var(--gray-dark));
+      }
+
+      /* Wider content for large screens */
+      @media (min-width: 1400px) {
+        .prose {
+          max-width: 1000px;
+        }
       }
 
       /* Dark mode styles */

@@ -95,16 +95,23 @@ const { Content } = await project.render();
 
 <style>
   .project-article {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem 1rem;
+  }
+
+  /* Wider layout for large screens */
+  @media (min-width: 1600px) {
+    .project-article {
+      max-width: 1600px;
+    }
   }
 
   .project-header {
-    margin-bottom: 4rem;
-    padding-bottom: 3rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid rgb(var(--gray-light));
-    max-width: 65ch;
+    max-width: 75ch;
     margin-left: auto;
     margin-right: auto;
   }
@@ -216,7 +223,7 @@ const { Content } = await project.render();
   }
 
   .project-hero-image {
-    margin: 3rem 0;
+    margin: 1.5rem 0;
     text-align: center;
   }
 
@@ -224,6 +231,8 @@ const { Content } = await project.render();
     width: 100%;
     max-width: 1000px;
     height: auto;
+    display: block;
+    margin: 0 auto;
     border-radius: 1rem;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     transition:
@@ -238,24 +247,31 @@ const { Content } = await project.render();
 
   .content {
     line-height: 1.8;
-    max-width: 65ch;
+    max-width: 75ch;
     margin: 0 auto;
     font-size: 1.125rem;
   }
 
+  /* Wider content for large screens */
+  @media (min-width: 1400px) {
+    .content {
+      max-width: 85ch;
+    }
+  }
+
   .content p {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     line-height: 1.8;
   }
 
   .content ul,
   .content ol {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     padding-left: 2.5rem;
   }
 
   .content li {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
     line-height: 1.7;
   }
 
@@ -268,15 +284,93 @@ const { Content } = await project.render();
 
   .content pre {
     background: rgb(var(--gray-light));
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .content pre code {
     background: none;
     padding: 0;
+  }
+
+  /* Compact headings and sections */
+  .content h1,
+  .content h2,
+  .content h3,
+  .content h4,
+  .content h5,
+  .content h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .content h1:first-child,
+  .content h2:first-child,
+  .content h3:first-child,
+  .content h4:first-child,
+  .content h5:first-child,
+  .content h6:first-child {
+    margin-top: 0;
+  }
+
+  /* Main section styling */
+  .content h2 {
+    border-bottom: 3px solid var(--accent);
+    padding: 1rem 0;
+    margin: 3rem 0 2rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, transparent 100%);
+    background-size: 100% 2px;
+    background-repeat: no-repeat;
+    background-position: bottom;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .content h2:first-of-type {
+    margin-top: 2rem;
+  }
+
+  .content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .content h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Section background styling */
+  .content h2 + * {
+    margin-top: 0;
+  }
+
+  /* Add subtle background to main sections */
+  .content h2 {
+    position: relative;
+  }
+
+  .content h2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -1rem;
+    right: -1rem;
+    height: 100%;
+    background: rgba(var(--accent-rgb), 0.05);
+    border-radius: 8px;
+    z-index: -1;
   }
 
   /* Dark mode styles */
