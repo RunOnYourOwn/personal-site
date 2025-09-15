@@ -146,9 +146,59 @@ jobs:
           docker stop test-personal-site
           docker rm test-personal-site
 
+  version-bump:
+    name: Bump Version for Content Update
+    needs: test-container
+    runs-on: ubuntu-latest
+    outputs:
+      new-version: ${{ steps.bump-version.outputs.new-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Read current version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(cat VERSION)
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Bump patch version
+        id: bump-version
+        run: |
+          CURRENT_VERSION=$(cat VERSION)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+      - name: Update VERSION file
+        run: |
+          echo "${{ steps.bump-version.outputs.new-version }}" > VERSION
+          echo "Updated VERSION file to: ${{ steps.bump-version.outputs.new-version }}"
+
+      - name: Commit version bump
+        run: |
+          git add VERSION
+          git commit -m "chore: bump version to ${{ steps.bump-version.outputs.new-version }} for content update"
+          git push
+
+      - name: Create version tag
+        run: |
+          git tag -a "v${{ steps.bump-version.outputs.new-version }}" -m "Release v${{ steps.bump-version.outputs.new-version }} - Content update"
+          git push origin "v${{ steps.bump-version.outputs.new-version }}"
+
   publish:
     name: Publish to GHCR
-    needs: test-container
+    needs: version-bump
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -173,6 +223,8 @@ jobs:
           push: true
           tags: |
             ghcr.io/runonyourown/personal-site:latest
+            ghcr.io/runonyourown/personal-site:${{ needs.version-bump.outputs.new-version }}
+            ghcr.io/runonyourown/personal-site:v${{ needs.version-bump.outputs.new-version }}
             ghcr.io/runonyourown/personal-site:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
