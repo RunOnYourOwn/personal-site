@@ -284,6 +284,7 @@ main {
   width: 100%;
   max-width: 1400px;
   margin: auto;
+  margin-top: 60px; /* Account for fixed header */
   padding: 3em 1em;
 }
 

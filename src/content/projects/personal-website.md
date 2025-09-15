@@ -20,48 +20,69 @@ status: 'completed'
 heroImage: '../../assets/og-image.png'
 ---
 
-A modern, performance-optimized personal website showcasing my professional portfolio, technical expertise, and homelab infrastructure. Built with cutting-edge web technologies and deployed on a production-grade homelab setup.
+This is my personal website that showcases my work, projects, and thoughts. I built it to be fast, accessible, and easy to maintain while running on my own homelab infrastructure.
 
-## Key Features
+## Why I Built This
 
-- **Blazing Fast Performance**: Astro framework with zero-JS by default
-- **Custom Branding**: Professional OpenGraph images for social sharing
-- **Advanced SEO**: Comprehensive meta tags, structured data, and sitemap
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Dark Mode**: System preference detection with smooth transitions
-- **Content Management**: Type-safe collections with Zod validation
-- **Accessibility**: WCAG 2.1 AA compliance with skip links and ARIA labels
+I wanted a website that could grow with me and my projects. Instead of using a template or CMS, I built something custom that gives me complete control over the design and functionality. Plus, it's a great way to experiment with new web technologies and deployment practices.
 
-## Technical Implementation
+## What Makes It Special
 
-### Frontend Architecture
+### Performance First
 
-- **Framework**: Astro + MDX for content
-- **Styling**: Tailwind CSS with CSS variables for theming
-- **Typography**: Inter (UI) + JetBrains Mono (code)
-- **Animations**: Subtle scroll animations and micro-interactions
-- **Search**: Client-side fuzzy search with Fuse.js
+- **Astro Framework** - Zero JavaScript by default means lightning-fast page loads
+- **Optimized Images** - Custom OpenGraph images and responsive image handling
+- **Minimal Bundle** - Only loads JavaScript when you actually need it
+- **Perfect Lighthouse Scores** - 100/100 across all performance metrics
 
-### SEO & Social Sharing
+### Developer Experience
 
-- **OpenGraph**: Custom branded images for all pages
-- **Structured Data**: JSON-LD schemas for rich snippets
-- **Meta Tags**: Comprehensive social media optimization
-- **Analytics**: Privacy-friendly Umami integration
+- **Type Safety** - Everything is typed with TypeScript and Zod validation
+- **Content Collections** - Blog posts and projects are managed as structured data
+- **Hot Reload** - Instant updates during development
+- **Linting & Formatting** - Automated code quality checks
 
-### Deployment Pipeline
+### User Experience
 
-- **Containerization**: Multi-stage Docker builds
-- **Registry**: GitHub Container Registry (GHCR)
-- **Orchestration**: Portainer for container management
-- **Routing**: SWAG reverse proxy with automatic SSL
-- **CI/CD**: GitHub Actions for automated deployment
+- **Mobile First** - Looks great on any device
+- **Dark Mode** - Automatically matches your system preference
+- **Accessibility** - Skip links, ARIA labels, and keyboard navigation
+- **Search** - Find content quickly with fuzzy search
 
-## Performance Metrics
+## Technical Stack
 
-- **Lighthouse Score**: 100/100 across all categories
-- **Core Web Vitals**: Optimized for excellent user experience
-- **Bundle Size**: Minimal JavaScript footprint
-- **Loading Speed**: Sub-second initial page loads
+### Frontend
 
-This website demonstrates my full-stack development capabilities, from modern frontend frameworks to production infrastructure deployment.
+- **Astro** - The web framework that powers everything
+- **Tailwind CSS** - Utility-first styling with custom design tokens
+- **MDX** - Markdown with JSX for rich content
+- **TypeScript** - Type safety throughout the codebase
+
+### Content & SEO
+
+- **Structured Data** - JSON-LD schemas for rich search results
+- **OpenGraph** - Custom branded images for social sharing
+- **Sitemap** - Automatic generation for search engines
+- **Analytics** - Privacy-friendly Umami tracking
+
+### Deployment & Infrastructure
+
+- **Docker** - Containerized for consistent deployment
+- **GitHub Actions** - Automated CI/CD pipeline
+- **Portainer** - Container orchestration and management
+- **SWAG** - Reverse proxy with automatic SSL certificates
+
+## Development Workflow
+
+When I want to add new content or make changes:
+
+1. **Content Updates** - Just push to main, automated deployment handles the rest
+2. **Code Changes** - Create a PR, CI checks run automatically, merge when ready
+3. **Releases** - Tag a version, full deployment pipeline kicks in
+4. **Monitoring** - Umami tracks usage and performance metrics
+
+## Performance Results
+
+This site loads in under a second and scores perfect Lighthouse ratings. The combination of Astro's zero-JS approach and optimized images means visitors get a fast, smooth experience regardless of their connection speed.
+
+Building this website has been a great way to practice modern web development while creating something I actually use every day. It's also taught me a lot about deployment automation and infrastructure management.
