@@ -248,7 +248,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: v${{ steps.version.outputs.version }}
           release_name: Personal Site v${{ steps.version.outputs.version }}
           body: ${{ steps.release_notes.outputs.release_body }}
           draft: false
