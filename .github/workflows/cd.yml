@@ -185,8 +185,13 @@ jobs:
       - name: Extract version from tag
         id: version
         run: |
-          # Extract version from git tag (remove 'v' prefix)
-          VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            # Extract version from git tag (remove 'v' prefix)
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            # For main branch pushes, get version from VERSION file
+            VERSION=$(cat VERSION | tr -d ' \t\n\r')
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Release version: $VERSION"
 
