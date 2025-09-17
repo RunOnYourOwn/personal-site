@@ -27,11 +27,8 @@ const { title, description, image = FallbackImage } = Astro.props;
       '(prefers-color-scheme: dark)'
     ).matches;
 
-    // Default to dark mode if no preference is saved
-    const shouldBeDark =
-      savedTheme === 'dark' ||
-      (!savedTheme && prefersDark) ||
-      (!savedTheme && !prefersDark);
+    // Use saved theme, or default to system preference
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
 
     if (shouldBeDark) {
       document.documentElement.classList.add('dark');

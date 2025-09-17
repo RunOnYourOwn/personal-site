@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  remark42:
+    image: ghcr.io/umputun/remark42:latest
+    container_name: remark42-prod
+    hostname: remark42-prod
+    restart: unless-stopped
+
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
+
+    # No direct port exposure in production - use SWAG proxy
+    # ports:
+    #   - '8081:8080'
+
+    environment:
+      - REMARK_URL=${REMARK_URL}
+      - SECRET=${REMARK42_SECRET}
+      - DEBUG=false
+      - AUTH_GITHUB_CID=${GITHUB_OAUTH_CID}
+      - AUTH_GITHUB_CSEC=${GITHUB_OAUTH_CSEC}
+      - AUTH_ANON=true
+      - ADMIN_SHARED_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_SHARED_ID=${ADMIN_SHARED_ID}
+      # - ADMIN_PASSWD=${ADMIN_PASSWD}
+      - NOTIFY_ADMINS=email
+      - NOTIFY_USERS=email
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_TLS=false
+      - SMTP_STARTTLS=true
+      - NOTIFY_EMAIL_FROM=${FROM_EMAIL}
+
+    volumes:
+      - ./remark42-data:/srv/var
+
+    networks:
+      - comments-network
+
+networks:
+  comments-network:
+    driver: bridge

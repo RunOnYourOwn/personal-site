@@ -1,0 +1,46 @@
+services:
+  remark42:
+    image: ghcr.io/umputun/remark42:latest
+    container_name: remark42-dev
+    hostname: remark42-dev
+    restart: unless-stopped
+
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
+
+    # Expose for local development
+    ports:
+      - '8081:8080'
+
+    environment:
+      - REMARK_URL=http://localhost:8081
+      - SECRET=${REMARK42_SECRET}
+      - DEBUG=true
+      - AUTH_GITHUB_CID=${GITHUB_OAUTH_CID}
+      - AUTH_GITHUB_CSEC=${GITHUB_OAUTH_CSEC}
+      - AUTH_ANON=true
+      - ADMIN_SHARED_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_SHARED_ID=${ADMIN_SHARED_ID}
+      - ADMIN_PASSWD=${ADMIN_PASSWD}
+      - NOTIFY_ADMINS=email
+      - NOTIFY_USERS=email
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_TLS=false
+      - SMTP_STARTTLS=true
+      - NOTIFY_EMAIL_FROM=${FROM_EMAIL}
+
+    volumes:
+      - ./remark42-data:/srv/var
+
+    networks:
+      - comments-network
+
+networks:
+  comments-network:
+    driver: bridge
