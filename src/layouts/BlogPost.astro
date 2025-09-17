@@ -326,8 +326,14 @@ const readingTime = 5; // Default fallback
       }
 
       window.remark_config = {
-        host: import.meta.env.PUBLIC_REMARK42_HOST || 'http://localhost:8081',
-        site_id: import.meta.env.PUBLIC_REMARK42_SITE_ID || 'remark',
+        host:
+          import.meta.env.PUBLIC_REMARK42_HOST ||
+          import.meta.env.PUBLIC_REMARK42_HOST ||
+          'http://localhost:8081',
+        site_id:
+          import.meta.env.PUBLIC_REMARK42_SITE_ID ||
+          import.meta.env.PUBLIC_REMARK42_SITE_ID ||
+          'remark',
         url: window.location.href,
         theme: getCurrentTheme(),
         locale: 'en',
