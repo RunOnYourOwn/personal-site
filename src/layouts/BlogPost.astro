@@ -132,6 +132,19 @@ const readingTime = 5; // Default fallback
         margin-top: 3rem;
         padding-top: 2rem;
         border-top: 1px solid var(--border);
+        width: 100%;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1em;
+        padding-right: 1em;
+      }
+
+      /* Wider content for large screens */
+      @media (min-width: 1400px) {
+        .comments-section {
+          max-width: 1000px;
+        }
       }
 
       .comments-section h3 {
