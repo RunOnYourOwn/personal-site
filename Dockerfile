@@ -18,6 +18,12 @@ ENV NODE_ENV=production
 ARG SITE_URL=https://aaronbrazier.com
 ENV SITE_URL=${SITE_URL}
 
+# Set Remark42 environment variables
+ARG PUBLIC_REMARK42_HOST=https://comments.aaronbrazier.com
+ARG PUBLIC_REMARK42_SITE_ID=aaronbrazier
+ENV PUBLIC_REMARK42_HOST=${PUBLIC_REMARK42_HOST}
+ENV PUBLIC_REMARK42_SITE_ID=${PUBLIC_REMARK42_SITE_ID}
+
 # Build the site
 RUN npm run build
 
