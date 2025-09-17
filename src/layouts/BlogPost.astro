@@ -126,6 +126,20 @@ const readingTime = 5; // Default fallback
       .last-updated-on {
         font-style: italic;
       }
+
+      /* Comments section styling */
+      .comments-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .comments-section h3 {
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
     </style>
   </head>
 
@@ -178,6 +192,11 @@ const readingTime = 5; // Default fallback
             <hr />
           </div>
           <slot />
+        </div>
+
+        <!-- Remark42 Comments Section -->
+        <div class="comments-section">
+          <div id="remark42"></div>
         </div>
       </article>
     </main>
@@ -254,6 +273,117 @@ const readingTime = 5; // Default fallback
             }
           });
         }
+      });
+    </script>
+
+    <!-- Remark42 Comments -->
+    <script>
+      // TypeScript declarations for Remark42
+      declare global {
+        interface Window {
+          remark_config: {
+            host: string;
+            site_id: string;
+            url: string;
+            theme: string;
+            locale: string;
+            show_email_subscription: boolean;
+            simple_view: boolean;
+            max_shown_comments: number;
+            no_footer: boolean;
+            components: string[];
+          };
+          REMARK42?: {
+            changeTheme: (theme: string) => void;
+          };
+        }
+      }
+
+      // Function to detect current theme (only returns 'light' or 'dark')
+      function getCurrentTheme() {
+        const hasDarkClass =
+          document.documentElement.classList.contains('dark');
+
+        // If site has explicit dark class, use dark
+        if (hasDarkClass) {
+          return 'dark';
+        }
+        // If no dark class is present, use light theme (respect user's explicit choice)
+        return 'light';
+      }
+
+      window.remark_config = {
+        host: import.meta.env.PUBLIC_REMARK42_HOST || 'http://localhost:8081',
+        site_id: import.meta.env.PUBLIC_REMARK42_SITE_ID || 'remark',
+        url: window.location.href,
+        theme: getCurrentTheme(),
+        locale: 'en',
+        show_email_subscription: false,
+        simple_view: false,
+        max_shown_comments: 10,
+        no_footer: false,
+        components: ['embed'],
+      };
+
+      // Official Remark42 initialization script
+      // @ts-ignore
+      !(function (e, n) {
+        for (var o = 0; o < e.length; o++) {
+          var r = n.createElement('script'),
+            c = '.js',
+            d = n.head || n.body;
+          ('noModule' in r
+            ? ((r.type = 'module'), (c = '.mjs'))
+            : (r.async = !0),
+            (r.defer = !0),
+            (r.src = window.remark_config.host + '/web/' + e[o] + c),
+            d.appendChild(r));
+        }
+      })(window.remark_config.components || ['embed'], document);
+
+      // Listen for theme changes and update Remark42 theme
+      function updateRemark42Theme() {
+        if (window.REMARK42 && window.REMARK42.changeTheme) {
+          const newTheme = getCurrentTheme();
+          window.REMARK42.changeTheme(newTheme);
+        } else {
+          // If REMARK42 isn't ready yet, try again after a short delay
+          setTimeout(updateRemark42Theme, 100);
+        }
+      }
+
+      // Listen for theme changes
+      document.addEventListener('DOMContentLoaded', function () {
+        // Watch for class changes on html element
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            if (
+              mutation.type === 'attributes' &&
+              mutation.attributeName === 'class'
+            ) {
+              updateRemark42Theme();
+            }
+          });
+        });
+
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['class'],
+        });
+
+        // Also listen for system theme changes
+        window
+          .matchMedia('(prefers-color-scheme: dark)')
+          .addEventListener('change', updateRemark42Theme);
+
+        // Listen for Remark42 ready event
+        window.addEventListener('REMARK42::ready', function () {
+          // Force theme update when Remark42 is ready
+          setTimeout(updateRemark42Theme, 200);
+        });
+
+        // Also try to update theme after a delay to catch any missed events
+        setTimeout(updateRemark42Theme, 1000);
       });
     </script>
   </body>
