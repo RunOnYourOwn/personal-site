@@ -329,7 +329,7 @@ const readingTime = 5; // Default fallback
       // @ts-ignore
       !(function (e, n) {
         for (var o = 0; o < e.length; o++) {
-          var r = n.createElement('script'),
+          var r = n.createElement('script') as any,
             c = '.js',
             d = n.head || n.body;
           ('noModule' in r
