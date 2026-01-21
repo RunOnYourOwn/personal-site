@@ -3,9 +3,16 @@ name: CD Pipeline
 on:
   push:
     branches: [main]
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy without version check'
+        type: boolean
+        default: false
+      skip_tests:
+        description: 'Skip container tests and security scan (emergency only)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -19,10 +26,12 @@ jobs:
   check-and-tag:
     name: Check Version and Create Tag
     runs-on: [self-hosted, Linux]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     outputs:
       should-deploy: ${{ steps.check-version.outputs.should-deploy }}
       version: ${{ steps.check-version.outputs.version }}
+      force-deploy: ${{ github.event.inputs.force_deploy }}
+      skip-tests: ${{ github.event.inputs.skip_tests }}
     steps:
       - name: Pre-checkout cleanup
         run: |
@@ -46,15 +55,19 @@ jobs:
           # Get current version from VERSION file
           CURRENT_VERSION=$(cat VERSION | tr -d ' \t\n\r')
           echo "Current version: $CURRENT_VERSION"
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
+          # Check for force deploy
+          if [ "${{ github.event.inputs.force_deploy }}" == "true" ]; then
+            echo "Force deploy requested - bypassing version check"
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
           # Check if tag already exists
-          if git tag -l | grep -q "^v$CURRENT_VERSION$"; then
+          elif git tag -l | grep -q "^v$CURRENT_VERSION$"; then
             echo "Tag v$CURRENT_VERSION already exists, skipping deployment"
             echo "should-deploy=false" >> $GITHUB_OUTPUT
           else
             echo "New version detected: $CURRENT_VERSION"
             echo "should-deploy=true" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           fi
 
       - name: Create and push tag
@@ -62,6 +75,12 @@ jobs:
         run: |
           VERSION="${{ steps.check-version.outputs.version }}"
           TAG_NAME="v$VERSION"
+
+          # Skip tag creation if it already exists (force deploy case)
+          if git tag -l | grep -q "^$TAG_NAME$"; then
+            echo "Tag $TAG_NAME already exists, skipping tag creation"
+            exit 0
+          fi
 
           # Create annotated tag
           git tag -a "$TAG_NAME" -m "Release version $VERSION"
@@ -83,10 +102,7 @@ jobs:
     runs-on: [self-hosted, Linux]
     if: |
       always() && (
-        github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.check-and-tag.outputs.should-deploy == 'true'
-      ) || (
-        github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-      ) || (
+        (github.event_name == 'push' && needs.check-and-tag.outputs.should-deploy == 'true') ||
         github.event_name == 'workflow_dispatch'
       )
     steps:
@@ -135,9 +151,12 @@ jobs:
 
   test-container:
     name: Test Container
-    needs: build
+    needs: [check-and-tag, build]
     runs-on: [self-hosted, Linux]
-    if: always() && needs.build.result == 'success'
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      needs.check-and-tag.outputs.skip-tests != 'true'
     steps:
       - name: Pre-checkout cleanup
         run: |
@@ -231,9 +250,13 @@ jobs:
 
   publish:
     name: Publish to GHCR
-    needs: test-container
+    needs: [check-and-tag, build, test-container]
     runs-on: [self-hosted, Linux]
-    if: always() && needs.test-container.result == 'success'
+    if: |
+      always() && (
+        needs.test-container.result == 'success' ||
+        (needs.check-and-tag.outputs.skip-tests == 'true' && needs.build.result == 'success')
+      )
     steps:
       - name: Pre-checkout cleanup
         run: |
@@ -254,16 +277,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Extract version from tag
+      - name: Extract version
         id: version
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            # Extract version from git tag (remove 'v' prefix)
-            VERSION=${GITHUB_REF#refs/tags/v}
-          else
-            # For main branch pushes, get version from VERSION file
-            VERSION=$(cat VERSION | tr -d ' \t\n\r')
-          fi
+          VERSION=$(cat VERSION | tr -d ' \t\n\r')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Release version: $VERSION"
 

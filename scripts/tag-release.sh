@@ -1,8 +1,21 @@
 #!/bin/bash
 
-# Tag release script for Personal Site
+# Tag Release Script for Personal Site
+# =====================================
+# Manually creates and pushes a git tag for the current VERSION.
+#
+# NOTE: This is typically NOT needed! The CD workflow auto-creates tags
+# when a PR with a version bump is merged to main. Only use this script if:
+#   - CD failed to create the tag
+#   - You need to manually tag a specific commit
+#   - Troubleshooting tag issues
+#
 # Usage: ./scripts/tag-release.sh
-# Run this on main branch after PR merge to create and push the release tag
+#
+# Requirements:
+#   - Must be on main branch
+#   - Working directory must be clean
+#   - Tag must not already exist
 
 set -e
 
@@ -80,8 +93,9 @@ tag_release() {
         git push "$remote" "$tag_name"
     done
 
-    print_success "Release tag $tag_name created and pushed to all remotes"
-    print_info "Release is now live! CI/CD pipeline will build and deploy Docker images."
+    print_success "Release tag $tag_name created and pushed"
+    print_info "If CD didn't run automatically, trigger it manually:"
+    print_info "  gh workflow run cd.yml -f force_deploy=true"
 }
 
 # Main script logic
@@ -96,14 +110,9 @@ case $1 in
         echo "Usage: $0 [current]"
         echo ""
         echo "Commands:"
-        echo "  (no args)       Create and push release tag"
-        echo "  current         Show current version"
+        echo "  (no args)    Create and push release tag for current VERSION"
+        echo "  current      Show current version"
         echo ""
-        echo "Workflow:"
-        echo "1. Ensure you're on main branch"
-        echo "2. Ensure release PR has been merged"
-        echo "3. Run this script: $0"
-        echo ""
-        echo "Note: This script should only be run on the main branch after a release PR is merged."
+        echo "Note: CD auto-creates tags on PR merge. Only use this for manual recovery."
         ;;
 esac
