@@ -133,7 +133,7 @@ const server = http.createServer(async (req, res) => {
 
     console.log('✅ Success! Add these to your .env file:\n');
     console.log(`SPOTIFY_CLIENT_ID=${CLIENT_ID}`);
-    console.log(`SPOTIFY_CLIENT_SECRET=${CLIENT_SECRET}`);
+    console.log('SPOTIFY_CLIENT_SECRET=<your existing client secret>');
     console.log(`SPOTIFY_REFRESH_TOKEN=${tokens.refresh_token}`);
     console.log(
       '\nThen set USE_MOCK_DATA = false in src/pages/api/spotify/now-playing.ts\n'
