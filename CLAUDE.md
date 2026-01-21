@@ -101,7 +101,6 @@ For detailed information, reference using `@` syntax:
 - **Styling**: Tailwind CSS with Typography plugin
 - **Content**: MDX + Astro Content Collections + Zod validation
 - **Search**: Fuse.js (client-side fuzzy search)
-- **Comments**: Remark42 (self-hosted)
 - **Analytics**: Umami (self-hosted, privacy-friendly)
 - **DevOps**: Docker, GitHub Actions, Portainer, SWAG
 

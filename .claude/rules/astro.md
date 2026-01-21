@@ -126,7 +126,6 @@ const featured = await getCollection('projects', ({ data }) => data.featured);
 - **System preference detection** on initial load
 - **Manual toggle** persisted to localStorage
 - **FOUC prevention** - Inline script in `<head>` (see BaseHead.astro)
-- **Remark42 sync** - Comments theme updates with page theme
 
 ### Tag Color System
 
@@ -144,7 +143,7 @@ Tags are color-coded by category in `BlogCard.astro` and `ProjectCard.astro`:
 ### Layouts
 
 - **`BaseLayout.astro`** - Main wrapper (Header, Footer, skip links)
-- **`BlogPost.astro`** - Blog-specific (reading time, comments, copy link)
+- **`BlogPost.astro`** - Blog-specific layout for posts
 
 ### Shared Components
 
