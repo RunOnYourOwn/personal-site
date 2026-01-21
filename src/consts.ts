@@ -3,7 +3,7 @@
 
 export const SITE_TITLE = 'Aaron Brazier';
 export const SITE_DESCRIPTION =
-  'Data scientist building ML systems, tinkering with homelabs, and occasionally writing about it.';
+  'Data scientist building ML systems, listening to music, tinkering with homelabs, and occasionally writing about it.';
 
 // Site version is now managed via VERSION file and git tags
 // Use getSiteVersion() function to get current version

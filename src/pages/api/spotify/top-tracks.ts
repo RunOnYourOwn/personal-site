@@ -8,8 +8,26 @@ const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 
 // Artists to filter out (case-insensitive)
 // Tracks by these artists won't appear in your top lists
+// NOTE: Add individual artist names, not combined strings
 const BLOCKED_ARTISTS = [
-  'Spidey and His Amazing Friends',
+  'Patrick Stump',
+  "Marvel's Spidey and His Amazing Friends - Cast",
+  'Taylor Swift',
+  'Elmo & Patsy',
+  'Mandy Moore',
+  'Brad Garrett',
+  'Zachary Levi',
+  'Jeffrey Tambor',
+  'Idina Menzel',
+  'Larry Groce',
+  'Mickey Mouse',
+  'Goofy',
+  'Disney Junior',
+  'Becky G',
+  'SuperKitties - Cast',
+  'The Laurie Berkner Band',
+  'Super Simple Songs',
+  'Bruce Channell',
   // Add more here as needed
 ];
 

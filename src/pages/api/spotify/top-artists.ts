@@ -9,7 +9,15 @@ const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 // Artists to filter out (case-insensitive)
 // Add any artists you don't want appearing in your top lists
 const BLOCKED_ARTISTS = [
-  'Spidey and His Amazing Friends',
+  'Marvel’s Spidey and His Amazing Friends - Cast',
+  'Patrick Stump',
+  'Taylor Swift',
+  'SuperKitties - Cast',
+  'Mickey Mouse',
+  'The Laurie Berkner Band',
+  'Mandy Moore',
+  'Super Simple Songs',
+
   // Add more here as needed
 ];
 
