@@ -27,6 +27,7 @@ const REDIRECT_URI = 'http://127.0.0.1:3000/callback';
 const SCOPES = [
   'user-read-currently-playing',
   'user-read-recently-played',
+  'user-top-read',
 ].join(' ');
 
 if (!CLIENT_ID || !CLIENT_SECRET) {

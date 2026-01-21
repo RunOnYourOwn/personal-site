@@ -1,0 +1,422 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Music - Aaron Brazier"
+  description="What I've been listening to on Spotify. Top artists and tracks from my listening history."
+>
+  <main class="content">
+    <header class="page-header">
+      <h1 class="page-title">Music</h1>
+      <p class="page-description">
+        What I've been listening to lately, powered by Spotify.
+      </p>
+    </header>
+
+    <div class="time-filter">
+      <button class="time-btn active" data-range="short_term"
+        >Last 4 weeks</button
+      >
+      <button class="time-btn" data-range="medium_term">Last 6 months</button>
+      <button class="time-btn" data-range="long_term">All time</button>
+    </div>
+
+    <section class="section">
+      <h2 class="section-title">Top Artists</h2>
+      <div class="artists-grid" id="artists-grid">
+        <div class="loading">Loading...</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Top Tracks</h2>
+      <ol class="tracks-list" id="tracks-list">
+        <li class="loading">Loading...</li>
+      </ol>
+    </section>
+
+    <p class="spotify-credit">
+      Data from <a href="https://spotify.com" target="_blank" rel="noopener"
+        >Spotify</a
+      >
+    </p>
+  </main>
+</BaseLayout>
+
+<script>
+  let currentTimeRange = 'short_term';
+
+  async function fetchTopArtists(timeRange: string) {
+    try {
+      const response = await fetch(
+        `/api/spotify/top-artists?time_range=${timeRange}&limit=10`
+      );
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
+    }
+  }
+
+  async function fetchTopTracks(timeRange: string) {
+    try {
+      const response = await fetch(
+        `/api/spotify/top-tracks?time_range=${timeRange}&limit=10`
+      );
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
+    }
+  }
+
+  function renderArtists(
+    data: {
+      artists: Array<{
+        name: string;
+        image: string;
+        url: string;
+        genres: string[];
+      }>;
+    } | null
+  ) {
+    const container = document.getElementById('artists-grid');
+    if (!container) return;
+
+    if (!data || !data.artists.length) {
+      container.innerHTML = '<div class="empty">No data available</div>';
+      return;
+    }
+
+    container.innerHTML = data.artists
+      .map(
+        (artist, index) => `
+        <a href="${artist.url}" target="_blank" rel="noopener" class="artist-card">
+          <span class="artist-rank">${index + 1}</span>
+          <img src="${artist.image}" alt="${artist.name}" class="artist-image" loading="lazy" />
+          <div class="artist-info">
+            <span class="artist-name">${artist.name}</span>
+            <span class="artist-genres">${artist.genres.join(', ')}</span>
+          </div>
+        </a>
+      `
+      )
+      .join('');
+  }
+
+  function renderTracks(
+    data: {
+      tracks: Array<{
+        name: string;
+        artist: string;
+        album: string;
+        image: string;
+        url: string;
+      }>;
+    } | null
+  ) {
+    const container = document.getElementById('tracks-list');
+    if (!container) return;
+
+    if (!data || !data.tracks.length) {
+      container.innerHTML = '<li class="empty">No data available</li>';
+      return;
+    }
+
+    container.innerHTML = data.tracks
+      .map(
+        (track, index) => `
+        <li class="track-item">
+          <span class="track-rank">${index + 1}</span>
+          <img src="${track.image}" alt="${track.album}" class="track-image" loading="lazy" />
+          <div class="track-info">
+            <a href="${track.url}" target="_blank" rel="noopener" class="track-name">${track.name}</a>
+            <span class="track-artist">${track.artist}</span>
+          </div>
+        </li>
+      `
+      )
+      .join('');
+  }
+
+  async function loadData(timeRange: string) {
+    currentTimeRange = timeRange;
+
+    // Show loading state
+    const artistsContainer = document.getElementById('artists-grid');
+    const tracksContainer = document.getElementById('tracks-list');
+    if (artistsContainer)
+      artistsContainer.innerHTML = '<div class="loading">Loading...</div>';
+    if (tracksContainer)
+      tracksContainer.innerHTML = '<li class="loading">Loading...</li>';
+
+    // Fetch in parallel
+    const [artistsData, tracksData] = await Promise.all([
+      fetchTopArtists(timeRange),
+      fetchTopTracks(timeRange),
+    ]);
+
+    renderArtists(artistsData);
+    renderTracks(tracksData);
+  }
+
+  // Initialize time filter buttons
+  document.querySelectorAll('.time-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const target = e.target as HTMLButtonElement;
+      const range = target.dataset.range;
+      if (!range || range === currentTimeRange) return;
+
+      // Update active state
+      document
+        .querySelectorAll('.time-btn')
+        .forEach(b => b.classList.remove('active'));
+      target.classList.add('active');
+
+      loadData(range);
+    });
+  });
+
+  // Initial load
+  loadData(currentTimeRange);
+</script>
+
+<style>
+  .content {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .page-description {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+
+  .time-filter {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .time-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .time-btn:hover {
+    color: var(--text-secondary);
+    border-color: var(--text-muted);
+  }
+
+  .time-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+  }
+
+  /* Artists Grid */
+  .artists-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  :global(.artist-card) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  :global(.artist-card:hover) {
+    background: var(--border);
+  }
+
+  :global(.artist-rank) {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    width: 1.5rem;
+    text-align: center;
+  }
+
+  :global(.artist-image) {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  :global(.artist-info) {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  :global(.artist-name) {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.artist-genres) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Tracks List */
+  .tracks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  :global(.track-item) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  :global(.track-item:last-child) {
+    border-bottom: none;
+  }
+
+  :global(.track-rank) {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    width: 1.5rem;
+    text-align: center;
+  }
+
+  :global(.track-image) {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  :global(.track-info) {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  :global(.track-name) {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s ease;
+  }
+
+  :global(.track-name:hover) {
+    color: var(--accent);
+  }
+
+  :global(.track-artist) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Loading & Empty States */
+  .loading,
+  :global(.loading),
+  .empty,
+  :global(.empty) {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    padding: 1rem 0;
+  }
+
+  /* Spotify Credit */
+  .spotify-credit {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .spotify-credit a {
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .spotify-credit a:hover {
+    color: #1db954;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .content {
+      padding: 5rem 1rem 3rem;
+    }
+
+    .time-filter {
+      flex-wrap: wrap;
+    }
+
+    .time-btn {
+      flex: 1;
+      min-width: fit-content;
+    }
+  }
+</style>
