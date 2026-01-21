@@ -11,7 +11,7 @@
 #   - Git status and latest tag
 #   - Recent releases
 #   - Last CD workflow run
-#   - Production health check
+#   - Production health check + deployed version verification
 #   - Available GHCR images
 #   - Quick recovery commands
 
@@ -93,13 +93,37 @@ else
 fi
 echo ""
 
-# 6. Production health check
+# 6. Production health check and deployed version
 echo -e "${BLUE}Production Health:${NC}"
 PROD_URL="https://aaronbrazier.com"
-HEALTH_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL" || echo "000")
+PROD_RESPONSE=$(curl -s "$PROD_URL")
+HEALTH_CODE=$(echo "$PROD_RESPONSE" | head -c 1 > /dev/null && curl -s -o /dev/null -w "%{http_code}" "$PROD_URL" || echo "000")
 
 if [ "$HEALTH_CODE" == "200" ]; then
   echo -e "  ${GREEN}✓${NC} $PROD_URL - HTTP $HEALTH_CODE"
+
+  # Extract version from footer copyright line (format: "Aaron Brazier · v2.0.6")
+  DEPLOYED_VERSION=$(echo "$PROD_RESPONSE" | grep -o 'Aaron Brazier[^<]*' | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+
+  if [ -n "$DEPLOYED_VERSION" ]; then
+    echo -e "  Deployed version: $DEPLOYED_VERSION"
+
+    # Compare with VERSION file
+    if [ "v$CURRENT_VERSION" == "$DEPLOYED_VERSION" ]; then
+      echo -e "  ${GREEN}✓${NC} Deployed version matches VERSION file"
+    else
+      echo -e "  ${YELLOW}!${NC} Deployed version ($DEPLOYED_VERSION) differs from VERSION file (v$CURRENT_VERSION)"
+    fi
+
+    # Compare with latest tag
+    if [ "$LATEST_TAG" == "$DEPLOYED_VERSION" ]; then
+      echo -e "  ${GREEN}✓${NC} Deployed version matches latest tag"
+    else
+      echo -e "  ${YELLOW}!${NC} Deployed version ($DEPLOYED_VERSION) differs from latest tag ($LATEST_TAG)"
+    fi
+  else
+    echo -e "  ${YELLOW}!${NC} Could not extract version from site footer"
+  fi
 else
   echo -e "  ${RED}✗${NC} $PROD_URL - HTTP $HEALTH_CODE"
 fi
