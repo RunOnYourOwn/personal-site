@@ -40,8 +40,8 @@ LABEL org.opencontainers.image.title="Personal Site" \
       org.opencontainers.image.vendor="Aaron Brazier" \
       org.opencontainers.image.licenses="MIT"
 
-# Install wget for health checks
-RUN apk add --no-cache wget
+# Update base packages to fix security vulnerabilities and install wget for health checks
+RUN apk upgrade --no-cache && apk add --no-cache wget
 
 # Copy custom nginx configuration template
 COPY nginx.conf /etc/nginx/templates/default.conf.template
