@@ -6,6 +6,13 @@ const USE_MOCK_DATA = false;
 const TOP_ARTISTS_ENDPOINT = 'https://api.spotify.com/v1/me/top/artists';
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 
+// Artists to filter out (case-insensitive)
+// Add any artists you don't want appearing in your top lists
+const BLOCKED_ARTISTS = [
+  'Spidey and His Amazing Friends',
+  // Add more here as needed
+];
+
 const MOCK_DATA = {
   artists: [
     {
@@ -81,14 +88,23 @@ async function getAccessToken(): Promise<string | null> {
   return data.access_token;
 }
 
+function isBlocked(artistName: string): boolean {
+  return BLOCKED_ARTISTS.some(
+    blocked => blocked.toLowerCase() === artistName.toLowerCase()
+  );
+}
+
 async function getTopArtists(
   accessToken: string,
-  timeRange: string = 'medium_term',
+  timeRange: string = 'short_term',
   limit: number = 10
 ): Promise<TopArtistsResponse | null> {
+  // Fetch extra to account for filtered artists
+  const fetchLimit = Math.min(limit + BLOCKED_ARTISTS.length + 10, 50);
+
   const url = new URL(TOP_ARTISTS_ENDPOINT);
   url.searchParams.set('time_range', timeRange);
-  url.searchParams.set('limit', limit.toString());
+  url.searchParams.set('limit', fetchLimit.toString());
 
   const response = await fetch(url.toString(), {
     headers: {
@@ -102,8 +118,10 @@ async function getTopArtists(
 
   const data = await response.json();
 
-  return {
-    artists: data.items.map(
+  const artists = data.items
+    .filter((artist: { name: string }) => !isBlocked(artist.name))
+    .slice(0, limit)
+    .map(
       (artist: {
         name: string;
         images: { url: string }[];
@@ -115,9 +133,9 @@ async function getTopArtists(
         url: artist.external_urls.spotify,
         genres: artist.genres.slice(0, 2),
       })
-    ),
-    timeRange,
-  };
+    );
+
+  return { artists, timeRange };
 }
 
 export const GET: APIRoute = async ({ url }) => {
