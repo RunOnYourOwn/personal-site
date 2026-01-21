@@ -28,6 +28,9 @@ pnpm-debug.log*
 # Cursor IDE files
 .cursor/
 
+# Claude Code settings
+.claude/settings.json
+
 # Additional cache and temporary files
 *.cache
 *.tmp
