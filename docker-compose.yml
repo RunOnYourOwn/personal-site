@@ -12,8 +12,10 @@ services:
       - proxy
     environment:
       - NODE_ENV=production
-    labels:
-      - 'swag.enable=true'
+      - SITE_URL=${SITE_URL}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - SPOTIFY_REFRESH_TOKEN=${SPOTIFY_REFRESH_TOKEN}
 
   # Development service (optional)
   personal-site-dev:
@@ -30,6 +32,10 @@ services:
       - personal-site-network
     environment:
       - NODE_ENV=development
+      - SITE_URL=${SITE_URL}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - SPOTIFY_REFRESH_TOKEN=${SPOTIFY_REFRESH_TOKEN}
     profiles:
       - dev
 

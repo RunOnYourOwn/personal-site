@@ -11,9 +11,10 @@ services:
       - proxy
     environment:
       - NODE_ENV=${NODE_ENV}
-      - UMAMI_URL=https://umami.yourdomain.com
-    labels:
-      - 'swag.enable=true'
+      - SITE_URL=${SITE_URL}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - SPOTIFY_REFRESH_TOKEN=${SPOTIFY_REFRESH_TOKEN}
 
 networks:
   proxy:
