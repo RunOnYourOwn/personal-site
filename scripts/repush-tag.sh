@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Re-push latest tag script for TurfTrack
+# Re-push tag script for Personal Site
 # Usage: ./scripts/repush-tag.sh [tag_name]
-# Run this to re-push a tag to all remotes
+# Deletes and recreates a tag at HEAD to re-trigger CD pipeline
 
 set -e
 
@@ -40,47 +40,40 @@ get_latest_tag() {
     echo "$latest_tag"
 }
 
-# Function to validate tag exists locally
-validate_tag() {
+# Function to get version from tag
+get_version_from_tag() {
     local tag=$1
-    if ! git tag -l | grep -q "^$tag$"; then
-        print_error "Tag '$tag' does not exist locally"
-        print_info "Available tags:"
-        git tag -l | sort -V | tail -10
-        exit 1
-    fi
+    echo "${tag#v}"
 }
 
-# Function to re-push tag
+# Function to recreate and push tag
 repush_tag() {
     local tag_name=$1
-    
-    print_info "Re-pushing tag '$tag_name' to all remotes..."
-    
-    # Check if working directory is clean
-    if [ -n "$(git status --porcelain)" ]; then
-        print_warning "Working directory is not clean, but continuing with tag push..."
-    fi
-    
-    # Push tag to all remotes
-    local push_success=true
-    for remote in $(git remote); do
-        print_info "  -> Pushing tag '$tag_name' to '$remote'"
-        if git push "$remote" "$tag_name" 2>/dev/null; then
-            print_success "    ✓ Successfully pushed to $remote"
-        else
-            print_error "    ✗ Failed to push to $remote"
-            push_success=false
-        fi
-    done
-    
-    if [ "$push_success" = true ]; then
-        print_success "Tag '$tag_name' successfully pushed to all remotes"
-    else
-        print_warning "Tag push completed with some failures"
-        print_info "You may need to check remote permissions or network connectivity"
-        exit 1
-    fi
+    local version=$(get_version_from_tag "$tag_name")
+
+    print_info "Re-creating tag '$tag_name' at current HEAD..."
+
+    # Fetch latest from origin
+    print_info "Fetching latest from origin..."
+    git fetch origin main
+
+    # Delete tag from remote if it exists
+    print_info "Deleting tag '$tag_name' from remote..."
+    git push origin --delete "$tag_name" 2>/dev/null || print_warning "Tag not found on remote (continuing)"
+
+    # Delete local tag if it exists
+    git tag -d "$tag_name" 2>/dev/null || true
+
+    # Create new tag at origin/main
+    print_info "Creating tag '$tag_name' at origin/main..."
+    git tag -a "$tag_name" origin/main -m "Release version $version"
+
+    # Push new tag
+    print_info "Pushing tag '$tag_name' to origin..."
+    git push origin "$tag_name"
+
+    print_success "Tag '$tag_name' recreated and pushed successfully!"
+    print_info "CD pipeline should now be triggered."
 }
 
 # Main script logic
@@ -97,7 +90,6 @@ case $1 in
         ;;
     *)
         # Tag specified
-        validate_tag "$1"
         repush_tag "$1"
         ;;
-esac 
+esac
