@@ -254,9 +254,18 @@ jobs:
           draft: false
           prerelease: false
 
+  deploy:
+    name: Deploy via Portainer
+    needs: publish
+    runs-on: [self-hosted, Linux]
+    steps:
       - name: Trigger Portainer Webhook
-        if: env.PORTAINER_WEBHOOK_URL != ''
-        run: |
-          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" || echo "Portainer webhook failed"
         env:
-          PORTAINER_WEBHOOK_URL: ${{ secrets.PORTAINER_WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.PORTAINER_WEBHOOK_URL }}
+        run: |
+          if [ -n "$WEBHOOK_URL" ]; then
+            echo "Triggering Portainer webhook..."
+            curl -X POST "$WEBHOOK_URL" && echo "Webhook triggered successfully" || echo "Webhook failed"
+          else
+            echo "PORTAINER_WEBHOOK_URL not set, skipping deployment"
+          fi
