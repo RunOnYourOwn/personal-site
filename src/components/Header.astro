@@ -50,14 +50,16 @@ import DarkModeToggle from './DarkModeToggle.astro';
       container.innerHTML = `
         <a href="${data.songUrl}" target="_blank" rel="noopener" class="now-playing-link">
           ${icon}
-          <span class="now-playing-track">${data.title} – ${data.artist}</span>
+          <span class="now-playing-track-wrapper">
+            <span class="now-playing-track">${data.title} – ${data.artist}</span>
+          </span>
         </a>
       `;
 
       // Check if text overflows and needs scrolling
       const track = container.querySelector('.now-playing-track');
-      const link = container.querySelector('.now-playing-link');
-      if (track && link && track.scrollWidth > link.clientWidth) {
+      const wrapper = container.querySelector('.now-playing-track-wrapper');
+      if (track && wrapper && track.scrollWidth > wrapper.clientWidth) {
         track.classList.add('scrolling');
       }
     } catch {
@@ -147,7 +149,12 @@ import DarkModeToggle from './DarkModeToggle.astro';
     text-decoration: none;
     transition: color 0.15s ease;
     max-width: 200px;
+  }
+
+  :global(.now-playing-track-wrapper) {
     overflow: hidden;
+    flex: 1;
+    min-width: 0;
   }
 
   :global(.now-playing-link:hover) {
