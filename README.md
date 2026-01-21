@@ -65,53 +65,36 @@ Here are the commands you'll actually use:
 
 ## Deployment Made Simple
 
-I've streamlined the deployment process so it's actually enjoyable to use. There are just two scripts, and they handle all the versioning magic for you:
+I've streamlined the deployment process with two scripts that handle versioning and tagging:
 
-### Adding Content (Blog posts, projects, assets)
-
-```bash
-# 1. Create a feature branch
-git checkout -b update-content
-
-# 2. Make your changes (blog posts, projects, etc.)
-# Edit files in src/content/ or add images
-
-# 3. Let the script do the heavy lifting
-./scripts/deploy-content.sh
-# This automatically bumps the patch version and commits
-
-# 4. Push and create a PR
-git push origin update-content
-# Create PR to main, merge when ready
-
-# 5. Sit back and relax
-# GitHub Actions detects the version change and deploys automatically
-```
-
-### Making Code Changes (Components, layouts, features)
+### Making Changes (Content or Code)
 
 ```bash
 # 1. Create a feature branch
-git checkout -b new-feature
+git checkout -b my-feature
 
-# 2. Make your changes (components, layouts, etc.)
-# Edit files in src/components/, src/layouts/, etc.
+# 2. Make your changes
+# Content: Edit files in src/content/ or add images
+# Code: Edit components, layouts, styles, etc.
 
-# 3. Choose your version bump
-./scripts/deploy-code.sh patch  # or minor/major
-# This bumps the version and commits
+# 3. Prepare the release (bumps VERSION and commits)
+./scripts/prepare-release.sh patch    # Bug fixes, content updates
+./scripts/prepare-release.sh minor    # New features
+./scripts/prepare-release.sh major    # Breaking changes, redesigns
 
 # 4. Push and create a PR
-git push origin new-feature
+git push origin my-feature
 # Create PR to main, merge when ready
 
-# 5. Watch the magic happen
-# GitHub Actions detects the version change and deploys automatically
+# 5. After PR merge, tag the release
+git checkout main && git pull
+./scripts/tag-release.sh
+# Creates git tag and pushes - CI/CD deploys automatically
 ```
 
-### Version Bumping Made Easy
+### Version Bumping Guide
 
-- **patch**: Bug fixes, small improvements (1.0.5 → 1.0.6)
+- **patch**: Bug fixes, content updates, small improvements (1.0.5 → 1.0.6)
 - **minor**: New features, significant improvements (1.0.5 → 1.1.0)
 - **major**: Breaking changes, major redesigns (1.0.5 → 2.0.0)
 

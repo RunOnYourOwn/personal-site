@@ -49,16 +49,19 @@ npm run lint && npm run type-check && npm run build
 
 ## Deployment
 
-Version bumping triggers automatic deployment:
+Two-step process: prepare release on feature branch, then tag after merge.
 
 ```bash
-# Content changes (blog posts, projects, images)
-./scripts/deploy-content.sh           # Auto bumps patch version
+# 1. Prepare release (bumps VERSION and commits)
+./scripts/prepare-release.sh patch    # Bug fixes (1.0.5 → 1.0.6)
+./scripts/prepare-release.sh minor    # New features (1.0.5 → 1.1.0)
+./scripts/prepare-release.sh major    # Breaking changes (1.0.5 → 2.0.0)
 
-# Code changes (components, layouts, features)
-./scripts/deploy-code.sh patch        # Bug fixes (1.0.5 → 1.0.6)
-./scripts/deploy-code.sh minor        # New features (1.0.5 → 1.1.0)
-./scripts/deploy-code.sh major        # Breaking changes (1.0.5 → 2.0.0)
+# 2. Push branch and create PR to main
+
+# 3. After PR merge, checkout main and tag:
+git checkout main && git pull
+./scripts/tag-release.sh              # Creates git tag, triggers CI/CD
 ```
 
 ## Project Structure
