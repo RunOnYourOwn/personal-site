@@ -60,3 +60,9 @@ docker-compose*
 README.md
 CONTENT_GUIDE.md
 IMPLEMENTATION_PLAN.md
+CLAUDE.md
+
+# CI/CD and development tools
+.github/
+scripts/
+.claude/

@@ -24,6 +24,22 @@ RUN npm run build
 # Production stage with Nginx
 FROM nginx:1.27-alpine AS production
 
+# Build arguments for metadata
+ARG VERSION=dev
+ARG BUILD_DATE
+ARG VCS_REF
+
+# OCI labels for image metadata
+LABEL org.opencontainers.image.title="Personal Site" \
+      org.opencontainers.image.description="Aaron Brazier's personal website built with Astro" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.source="https://github.com/RunOnYourOwn/personal-site" \
+      org.opencontainers.image.url="https://aaronbrazier.com" \
+      org.opencontainers.image.vendor="Aaron Brazier" \
+      org.opencontainers.image.licenses="MIT"
+
 # Install wget for health checks
 RUN apk add --no-cache wget
 

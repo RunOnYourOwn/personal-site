@@ -164,27 +164,53 @@ jobs:
           # Start the container with environment variables
           docker run -d --name test-personal-site -p 8080:80 -e UMAMI_URL=https://umami.aaronbrazier.com personal-site:ci
 
-          # Wait for container to start
-          sleep 10
-
-          # Check if container is running
-          docker ps | grep test-personal-site
+          # Wait for container to be healthy (up to 60 seconds)
+          echo "Waiting for container to be healthy..."
+          for i in {1..30}; do
+            if curl -sf http://localhost:8080/healthz > /dev/null 2>&1; then
+              echo "Container is healthy after $((i*2)) seconds"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Container failed to become healthy"
+              docker logs test-personal-site
+              exit 1
+            fi
+            sleep 2
+          done
 
           # Test health endpoint
           echo "Testing health endpoint..."
-          curl -f http://localhost:8080/healthz || echo "Health endpoint test failed"
+          curl -f http://localhost:8080/healthz || { echo "Health endpoint test failed"; exit 1; }
 
-          # Test main page
+          # Test main page with content verification
           echo "Testing main page..."
-          curl -f http://localhost:8080/ || echo "Main page test failed"
+          response=$(curl -sf http://localhost:8080/)
+          echo "$response" | grep -q "<title>" || { echo "Main page missing title tag"; exit 1; }
+          echo "Main page OK"
 
           # Test blog page
           echo "Testing blog page..."
-          curl -f http://localhost:8080/blog/ || echo "Blog page test failed"
+          response=$(curl -sf http://localhost:8080/blog/)
+          echo "$response" | grep -q "<title>" || { echo "Blog page missing title tag"; exit 1; }
+          echo "Blog page OK"
 
           # Test projects page
           echo "Testing projects page..."
-          curl -f http://localhost:8080/projects/ || echo "Projects page test failed"
+          response=$(curl -sf http://localhost:8080/projects/)
+          echo "$response" | grep -q "<title>" || { echo "Projects page missing title tag"; exit 1; }
+          echo "Projects page OK"
+
+          # Test 404 handling
+          echo "Testing 404 handling..."
+          status=$(curl -so /dev/null -w "%{http_code}" http://localhost:8080/nonexistent-page-12345)
+          if [ "$status" != "404" ]; then
+            echo "Expected 404, got $status"
+            exit 1
+          fi
+          echo "404 handling OK"
+
+          echo "All container tests passed!"
 
           # Clean up
           docker stop test-personal-site
@@ -193,9 +219,9 @@ jobs:
       - name: Security Scan
         run: |
           mkdir -p $HOME/bin
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.48.0
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.58.0
           echo "Scanning image for vulnerabilities..."
-          $HOME/bin/trivy image --severity HIGH,CRITICAL personal-site:ci || echo "Vulnerabilities found in image"
+          $HOME/bin/trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 personal-site:ci
 
       - name: Clean up Docker resources
         if: always()
@@ -257,6 +283,10 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
           tags: |
             ghcr.io/runonyourown/personal-site:latest
             ghcr.io/runonyourown/personal-site:${{ github.sha }}
@@ -297,15 +327,15 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          release_name: Personal Site v${{ steps.version.outputs.version }}
+          name: Personal Site v${{ steps.version.outputs.version }}
           body: ${{ steps.release_notes.outputs.release_body }}
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean up Docker resources
         if: always()
