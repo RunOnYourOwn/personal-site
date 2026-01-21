@@ -11,7 +11,8 @@ const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 // NOTE: Add individual artist names, not combined strings
 const BLOCKED_ARTISTS = [
   'Patrick Stump',
-  "Marvel's Spidey and His Amazing Friends - Cast",
+  'Spidey',
+  'Marvel’s Spidey and His Amazing Friends - Cast',
   'Taylor Swift',
   'Elmo & Patsy',
   'Mandy Moore',
