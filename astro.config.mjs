@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
+import node from '@astrojs/node';
 
 export default defineConfig({
   site:
@@ -10,7 +11,9 @@ export default defineConfig({
       ? 'https://aaronbrazier.com'
       : 'http://localhost:8080'),
   base: '/',
-  // trailingSlash: "always",
+  adapter: node({
+    mode: 'standalone',
+  }),
   integrations: [sitemap(), mdx()],
   vite: {
     plugins: [tailwindcss()],

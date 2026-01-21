@@ -1,0 +1,281 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Music - Aaron Brazier"
+  description="What I've been listening to on Spotify."
+>
+  <main class="content">
+    <header class="page-header">
+      <h1 class="page-title">Music</h1>
+    </header>
+
+    <div class="time-filter">
+      <button class="time-btn active" data-range="short_term"
+        >Last 4 weeks</button
+      >
+      <button class="time-btn" data-range="long_term">All time</button>
+    </div>
+
+    <section class="section">
+      <h2 class="section-title">Top Artists</h2>
+      <ol class="list" id="artists-list">
+        <li class="loading">Loading...</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Top Tracks</h2>
+      <ol class="list" id="tracks-list">
+        <li class="loading">Loading...</li>
+      </ol>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  let currentTimeRange = 'short_term';
+
+  async function fetchData(endpoint: string, timeRange: string) {
+    try {
+      const response = await fetch(
+        `/api/spotify/${endpoint}?time_range=${timeRange}&limit=10`
+      );
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
+    }
+  }
+
+  function renderArtists(
+    data: {
+      artists: Array<{ name: string; image: string; url: string }>;
+    } | null
+  ) {
+    const container = document.getElementById('artists-list');
+    if (!container) return;
+
+    if (!data?.artists?.length) {
+      container.innerHTML = '<li class="empty">No data available</li>';
+      return;
+    }
+
+    container.innerHTML = data.artists
+      .map(
+        (artist, i) => `
+        <li class="item">
+          <span class="rank">${i + 1}</span>
+          <img src="${artist.image}" alt="" class="image image-round" loading="lazy" />
+          <a href="${artist.url}" target="_blank" rel="noopener">${artist.name}</a>
+        </li>
+      `
+      )
+      .join('');
+  }
+
+  function renderTracks(
+    data: {
+      tracks: Array<{
+        name: string;
+        artist: string;
+        image: string;
+        url: string;
+      }>;
+    } | null
+  ) {
+    const container = document.getElementById('tracks-list');
+    if (!container) return;
+
+    if (!data?.tracks?.length) {
+      container.innerHTML = '<li class="empty">No data available</li>';
+      return;
+    }
+
+    container.innerHTML = data.tracks
+      .map(
+        (track, i) => `
+        <li class="item">
+          <span class="rank">${i + 1}</span>
+          <img src="${track.image}" alt="" class="image" loading="lazy" />
+          <div class="info">
+            <a href="${track.url}" target="_blank" rel="noopener">${track.name}</a>
+            <span class="subtitle">${track.artist}</span>
+          </div>
+        </li>
+      `
+      )
+      .join('');
+  }
+
+  async function loadData(timeRange: string) {
+    currentTimeRange = timeRange;
+
+    const artistsList = document.getElementById('artists-list');
+    const tracksList = document.getElementById('tracks-list');
+    if (artistsList)
+      artistsList.innerHTML = '<li class="loading">Loading...</li>';
+    if (tracksList)
+      tracksList.innerHTML = '<li class="loading">Loading...</li>';
+
+    const [artists, tracks] = await Promise.all([
+      fetchData('top-artists', timeRange),
+      fetchData('top-tracks', timeRange),
+    ]);
+
+    renderArtists(artists);
+    renderTracks(tracks);
+  }
+
+  document.querySelectorAll('.time-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const target = e.target as HTMLButtonElement;
+      const range = target.dataset.range;
+      if (!range || range === currentTimeRange) return;
+
+      document
+        .querySelectorAll('.time-btn')
+        .forEach(b => b.classList.remove('active'));
+      target.classList.add('active');
+      loadData(range);
+    });
+  });
+
+  loadData(currentTimeRange);
+</script>
+
+<style>
+  .content {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .time-filter {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .time-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .time-btn:hover {
+    color: var(--text-secondary);
+    border-color: var(--text-muted);
+  }
+
+  .time-btn.active {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  .section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+  }
+
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  :global(.item) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+  }
+
+  :global(.rank) {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    width: 1.25rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  :global(.image) {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  :global(.image-round) {
+    border-radius: 50%;
+  }
+
+  :global(.item a) {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+    font-size: 0.9375rem;
+    transition: text-decoration-color 0.15s ease;
+  }
+
+  :global(.item a:hover) {
+    text-decoration-color: var(--text-primary);
+  }
+
+  :global(.info) {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  :global(.subtitle) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .loading,
+  :global(.loading),
+  .empty,
+  :global(.empty) {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .content {
+      padding: 5rem 1rem 3rem;
+    }
+  }
+</style>
