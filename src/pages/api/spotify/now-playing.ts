@@ -32,9 +32,9 @@ interface SpotifyTrack {
 }
 
 async function getAccessToken(): Promise<string | null> {
-  const clientId = import.meta.env.SPOTIFY_CLIENT_ID;
-  const clientSecret = import.meta.env.SPOTIFY_CLIENT_SECRET;
-  const refreshToken = import.meta.env.SPOTIFY_REFRESH_TOKEN;
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
 
   if (!clientId || !clientSecret || !refreshToken) {
     return null;
