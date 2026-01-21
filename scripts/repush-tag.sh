@@ -1,8 +1,20 @@
 #!/bin/bash
 
-# Re-push tag script for Personal Site
-# Usage: ./scripts/repush-tag.sh [tag_name]
-# Deletes and recreates a tag at HEAD to re-trigger CD pipeline
+# Re-push Tag Script for Personal Site
+# =====================================
+# Deletes and recreates a tag at origin/main HEAD.
+#
+# Use this when:
+#   - A tag was created at the wrong commit
+#   - You need to fix a tag after force-pushing main
+#   - Tag exists but points to an old commit
+#
+# Usage:
+#   ./scripts/repush-tag.sh v2.0.5    # Re-push specific tag
+#   ./scripts/repush-tag.sh           # Re-push latest tag
+#   ./scripts/repush-tag.sh current   # Show latest tag
+#
+# WARNING: This rewrites git history for the tag. Use with caution.
 
 set -e
 

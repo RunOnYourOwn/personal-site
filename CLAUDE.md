@@ -49,19 +49,24 @@ npm run lint && npm run type-check && npm run build
 
 ## Deployment
 
-Two-step process: prepare release on feature branch, then tag after merge.
+Version bump triggers automatic deployment when PR is merged to main.
 
 ```bash
-# 1. Prepare release (bumps VERSION and commits)
+# Normal deployment flow
 ./scripts/prepare-release.sh patch    # Bug fixes (1.0.5 → 1.0.6)
 ./scripts/prepare-release.sh minor    # New features (1.0.5 → 1.1.0)
 ./scripts/prepare-release.sh major    # Breaking changes (1.0.5 → 2.0.0)
+# Then push branch, create PR, merge → CD auto-deploys
 
-# 2. Push branch and create PR to main
+# Recovery scripts
+./scripts/force-deploy.sh             # Re-deploy without version bump
+./scripts/rollback.sh 2.0.3           # Rollback to specific version
+./scripts/emergency-deploy.sh         # Deploy skipping tests (use sparingly!)
 
-# 3. After PR merge, checkout main and tag:
-git checkout main && git pull
-./scripts/tag-release.sh              # Creates git tag, triggers CI/CD
+# Utilities
+./scripts/deployment-status.sh        # Check current deployment status
+./scripts/tag-release.sh              # Manually create tag (if needed)
+./scripts/repush-tag.sh v2.0.5        # Fix a tag pointing to wrong commit
 ```
 
 ## Project Structure
