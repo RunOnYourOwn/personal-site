@@ -109,8 +109,9 @@ echo ""
 echo -e "${BLUE}Recent Images in GHCR:${NC}"
 # Try gh API first, fall back to showing recent git tags as proxy
 if command -v gh &> /dev/null; then
+  # Filter to only show images with version tags (v*), skip untagged/sha-only images
   IMAGES=$(gh api /users/runonyourown/packages/container/personal-site/versions \
-    --jq '.[0:5] | .[] | "  " + .metadata.container.tags[0] + " (" + .created_at[0:10] + ")"' 2>/dev/null)
+    --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] | startswith("v"))] | .[0:5] | .[] | "  " + (.metadata.container.tags | map(select(startswith("v")))[0]) + " (" + .created_at[0:10] + ")"' 2>/dev/null)
   if [ -n "$IMAGES" ]; then
     echo "$IMAGES"
   else
