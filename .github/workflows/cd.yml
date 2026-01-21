@@ -137,6 +137,7 @@ jobs:
     name: Test Container
     needs: build
     runs-on: [self-hosted, Linux]
+    if: always() && needs.build.result == 'success'
     steps:
       - name: Pre-checkout cleanup
         run: |
@@ -215,6 +216,7 @@ jobs:
     name: Publish to GHCR
     needs: test-container
     runs-on: [self-hosted, Linux]
+    if: always() && needs.test-container.result == 'success'
     steps:
       - name: Pre-checkout cleanup
         run: |
@@ -322,6 +324,7 @@ jobs:
     name: Deploy via Portainer
     needs: publish
     runs-on: [self-hosted, Linux]
+    if: always() && needs.publish.result == 'success'
     steps:
       - name: Trigger Portainer Webhook
         env:
