@@ -231,7 +231,7 @@ jobs:
           mkdir -p $HOME/bin
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.58.0
           echo "Scanning image for vulnerabilities..."
-          $HOME/bin/trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 personal-site:ci
+          $HOME/bin/trivy image --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 personal-site:ci
 
       - name: Clean up Docker resources
         if: always()
