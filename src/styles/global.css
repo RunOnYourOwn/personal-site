@@ -1,3 +1,10 @@
+@import 'tailwindcss';
+@config '../../tailwind.config.js';
+@plugin '@tailwindcss/typography';
+
+/* Enable class-based dark mode (.dark class on html/body) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
   The CSS in this style tag is based off of Bear Blog's default CSS.
   https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css

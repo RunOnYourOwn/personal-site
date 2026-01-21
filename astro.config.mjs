@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 
@@ -11,7 +11,10 @@ export default defineConfig({
       : 'http://localhost:8080'),
   base: '/',
   // trailingSlash: "always",
-  integrations: [tailwind(), sitemap(), mdx()],
+  integrations: [sitemap(), mdx()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     shikiConfig: {
       theme: 'github-dark-dimmed',
