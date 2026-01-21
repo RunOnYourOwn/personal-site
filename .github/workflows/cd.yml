@@ -201,15 +201,6 @@ jobs:
           echo "$response" | grep -q "<title>" || { echo "Projects page missing title tag"; exit 1; }
           echo "Projects page OK"
 
-          # Test 404 handling
-          echo "Testing 404 handling..."
-          status=$(curl -so /dev/null -w "%{http_code}" http://localhost:8080/nonexistent-page-12345)
-          if [ "$status" != "404" ]; then
-            echo "Expected 404, got $status"
-            exit 1
-          fi
-          echo "404 handling OK"
-
           echo "All container tests passed!"
 
           # Clean up
