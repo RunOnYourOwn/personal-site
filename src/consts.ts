@@ -3,7 +3,7 @@
 
 export const SITE_TITLE = 'Aaron Brazier';
 export const SITE_DESCRIPTION =
-  'Senior Data Scientist specializing in machine learning, oil & gas analytics, and homelab infrastructure. Portfolio, blog, and project showcase.';
+  'Data scientist building ML systems, tinkering with homelabs, and occasionally writing about it.';
 
 // Site version is now managed via VERSION file and git tags
 // Use getSiteVersion() function to get current version
