@@ -191,9 +191,10 @@ jobs:
 
       - name: Security Scan
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.48.0
+          mkdir -p $HOME/bin
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.48.0
           echo "Scanning image for vulnerabilities..."
-          trivy image --severity HIGH,CRITICAL personal-site:ci || echo "Vulnerabilities found in image"
+          $HOME/bin/trivy image --severity HIGH,CRITICAL personal-site:ci || echo "Vulnerabilities found in image"
 
       - name: Clean up Docker resources
         if: always()
