@@ -11,15 +11,25 @@ permissions:
   contents: write
   packages: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check-and-tag:
     name: Check Version and Create Tag
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     outputs:
       should-deploy: ${{ steps.check-version.outputs.should-deploy }}
       version: ${{ steps.check-version.outputs.version }}
     steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -61,10 +71,16 @@ jobs:
 
           echo "Created and pushed tag: $TAG_NAME"
 
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+
   build:
     name: Build Docker Image
     needs: check-and-tag
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     if: |
       always() && (
         github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.check-and-tag.outputs.should-deploy == 'true'
@@ -74,19 +90,17 @@ jobs:
         github.event_name == 'workflow_dispatch'
       )
     steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: buildx-${{ github.sha }}
-          restore-keys: |
-            buildx-
 
       - name: Build image (local)
         uses: docker/build-push-action@v5
@@ -96,8 +110,6 @@ jobs:
           platforms: linux/amd64
           load: true
           tags: personal-site:ci
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
 
       - name: Save image
         run: docker save personal-site:ci -o personal-site-image.tar
@@ -108,11 +120,30 @@ jobs:
           name: personal-site-image
           path: personal-site-image.tar
 
+      - name: Clean up Docker resources
+        if: always()
+        run: |
+          echo "Cleaning up Docker resources..."
+          docker system prune -f --volumes || true
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -f personal-site-image.tar || true
+
   test-container:
     name: Test Container
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -164,11 +195,32 @@ jobs:
           echo "Scanning image for vulnerabilities..."
           trivy image --severity HIGH,CRITICAL personal-site:ci || echo "Vulnerabilities found in image"
 
+      - name: Clean up Docker resources
+        if: always()
+        run: |
+          echo "Cleaning up Docker resources..."
+          docker stop test-personal-site 2>/dev/null || true
+          docker rm test-personal-site 2>/dev/null || true
+          docker system prune -f --volumes || true
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -f personal-site-image.tar || true
+
   publish:
     name: Publish to GHCR
     needs: test-container
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -206,8 +258,6 @@ jobs:
             ghcr.io/runonyourown/personal-site:latest
             ghcr.io/runonyourown/personal-site:${{ github.sha }}
             ghcr.io/runonyourown/personal-site:v${{ steps.version.outputs.version }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
 
       - name: Generate Release Notes
         id: release_notes
@@ -253,6 +303,19 @@ jobs:
           body: ${{ steps.release_notes.outputs.release_body }}
           draft: false
           prerelease: false
+
+      - name: Clean up Docker resources
+        if: always()
+        run: |
+          echo "Cleaning up Docker resources..."
+          docker system prune -f --volumes || true
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -f release_body.md || true
 
   deploy:
     name: Deploy via Portainer

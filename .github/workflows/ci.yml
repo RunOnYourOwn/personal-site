@@ -15,11 +15,21 @@ permissions:
   contents: read
   packages: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test and Lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -27,7 +37,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -48,3 +57,10 @@ jobs:
             exit 1
           fi
           echo "Build successful - dist directory created"
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -rf node_modules || true
