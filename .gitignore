@@ -28,9 +28,6 @@ pnpm-debug.log*
 # Cursor IDE files
 .cursor/
 
-# Scripts directory (build/utility scripts)
-scripts/
-
 # Additional cache and temporary files
 *.cache
 *.tmp

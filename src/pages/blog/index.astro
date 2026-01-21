@@ -1,582 +1,153 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
-import Search from '../../components/Search.astro';
-import BlogCard from '../../components/BlogCard.astro';
-import { generateSearchData } from '../../scripts/generate-search-data.js';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { SITE_TITLE } from '../../consts';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-// Generate search data
-const searchData = await generateSearchData();
-
-// Get all unique tags for filtering
-const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
+const posts = (await getCollection('blog'))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<!doctype html>
-<html lang="en" class="dark">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body>
-    <Header />
-    <main class="blog-main">
-      <!-- Hero Section -->
-      <section class="blog-hero" aria-labelledby="blog-title">
-        <div class="blog-hero-content">
-          <h1 id="blog-title" class="blog-title">Blog</h1>
-          <p class="blog-subtitle">
-            Thoughts on development, technology, and more
-          </p>
-        </div>
-      </section>
+<BaseLayout
+  title={`Blog | ${SITE_TITLE}`}
+  description="Thoughts on development, data science, homelabs, and technology."
+>
+  <main class="content">
+    <header class="page-header">
+      <h1 class="page-title">Blog</h1>
+      <p class="page-description">
+        Thoughts on development, data science, homelabs, and technology.
+      </p>
+    </header>
 
-      <!-- Search & Filters Section -->
-      <section
-        class="search-filters-section"
-        aria-label="Search and filter blog posts"
-      >
-        <div class="search-container">
-          <Search
-            placeholder="Search blog posts and projects..."
-            searchData={searchData.all}
-          />
-        </div>
-
-        <div class="filters-container">
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="all"
-              >All Posts</button
-            >
-            {
-              allTags.map(tag => (
-                <button class="filter-btn" data-filter={tag.toLowerCase()}>
-                  {tag}
-                </button>
-              ))
-            }
-          </div>
-        </div>
-      </section>
-
-      <!-- Blog Posts Section -->
-      <section class="blog-posts-section">
-        <div class="blog-layout" id="blog-layout">
-          <!-- Featured Post -->
-          {
-            posts.length > 0 && (
-              <div
-                class="featured-post scroll-animate"
-                data-tags={
-                  posts[0].data.tags?.map(tag => tag.toLowerCase()).join(' ') ||
-                  ''
-                }
-                style="animation-delay: 0s"
-              >
-                <BlogCard post={posts[0]} featured={true} />
-              </div>
-            )
-          }
-
-          <!-- Grid Posts -->
-          <div class="blog-grid" id="blog-grid">
-            {
-              posts.slice(1).map((post, index) => (
-                <div
-                  class="blog-grid-item scroll-animate"
-                  data-tags={
-                    post.data.tags?.map(tag => tag.toLowerCase()).join(' ') ||
-                    ''
-                  }
-                  style={`animation-delay: ${(index + 1) * 0.1}s`}
-                >
-                  <BlogCard post={post} featured={false} />
+    {
+      posts.length > 0 ? (
+        <ul class="post-list">
+          {posts.map(post => (
+            <li class="post-item">
+              <a href={`/blog/${post.slug}`} class="post-link">
+                <div class="post-info">
+                  <span class="post-title">{post.data.title}</span>
+                  <span class="post-description">{post.data.description}</span>
                 </div>
-              ))
-            }
-          </div>
-        </div>
-
-        <div class="no-results" id="no-results" style="display: none;">
-          <div class="no-results-content">
-            <h3>No posts found</h3>
-            <p>Try adjusting your search or filter criteria.</p>
-          </div>
-        </div>
-      </section>
-    </main>
-    <Footer />
-  </body>
-</html>
+                <span class="post-date">
+                  <FormattedDate date={post.data.pubDate} />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty-message">No posts yet. Check back soon!</p>
+      )
+    }
+  </main>
+</BaseLayout>
 
 <style>
-  .blog-main {
-    max-width: 1200px;
+  .content {
+    max-width: 640px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 6rem 1.5rem 4rem;
   }
 
-  .blog-hero {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 2rem 0;
-    margin-top: 60px; /* Account for fixed header */
+  .page-header {
+    margin-bottom: 2.5rem;
   }
 
-  .blog-title {
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    font-weight: 800;
-    margin: 0 0 1.5rem 0;
-    background: linear-gradient(
-      135deg,
-      var(--accent),
-      var(--purple),
-      var(--green)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    background-size: 200% 200%;
-    animation: gradientShift 3s ease-in-out infinite;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
+  .page-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
   }
 
-  .blog-subtitle {
-    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
-    color: var(--text-secondary);
+  .page-description {
+    font-size: 1rem;
+    color: var(--text-muted);
     margin: 0;
     line-height: 1.6;
-    font-weight: 400;
-    letter-spacing: -0.01em;
   }
 
-  @keyframes gradientShift {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 
-  .search-filters-section {
-    margin-bottom: 3rem;
+  .post-item {
+    border-bottom: 1px solid var(--border);
   }
 
-  .search-container {
-    margin-bottom: 2rem;
+  .post-item:last-child {
+    border-bottom: none;
   }
 
-  .filters-container {
+  .post-link {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    text-decoration: none;
   }
 
-  .filter-group {
+  .post-link:hover .post-title {
+    color: var(--accent);
+  }
+
+  .post-info {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
   }
 
-  .filter-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 2rem;
-    background: var(--bg-primary);
+  .post-title {
     color: var(--text-secondary);
-    font-size: 0.875rem;
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    font-size: 1rem;
+    line-height: 1.4;
+    transition: color 0.15s ease;
+  }
+
+  .post-description {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  .filter-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(var(--accent-rgb), 0.2),
-      transparent
-    );
-    transition: left 0.5s ease;
+  .post-date {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .filter-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
-  }
-
-  .filter-btn:hover::before {
-    left: 100%;
-  }
-
-  .filter-btn.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
-  }
-
-  .blog-posts-section {
-    position: relative;
-  }
-
-  .blog-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-  }
-
-  .featured-post {
-    margin-bottom: 1rem;
-  }
-
-  .featured-post :global(.blog-card) {
-    max-width: none;
-    width: 100%;
-  }
-
-  .blog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
-    width: 100%;
-  }
-
-  .blog-grid-item {
-    display: block;
-    width: 100%;
-  }
-
-  .no-results {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-secondary);
-  }
-
-  .no-results-content h3 {
-    font-size: 1.5rem;
-    margin: 0 0 1rem 0;
-    color: var(--text-primary);
-  }
-
-  .no-results-content p {
-    margin: 0;
+  .empty-message {
+    color: var(--text-muted);
     font-size: 1rem;
   }
 
-  /* Dark mode styles */
-  :global(.dark) .blog-title {
-    color: white;
-  }
-
-  :global(.dark) .blog-subtitle {
-    color: rgb(209, 213, 219);
-  }
-
-  :global(.dark) .filter-btn {
-    background: rgb(31, 41, 55);
-    border-color: rgb(55, 65, 81);
-    color: rgb(156, 163, 175);
-  }
-
-  :global(.dark) .no-results-content h3 {
-    color: white;
-  }
-
-  :global(.dark) .no-results-content p {
-    color: rgb(156, 163, 175);
-  }
-
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .blog-main {
-      padding: 0.75rem;
-      max-width: 100vw;
-      overflow-x: hidden;
+  /* Responsive */
+  @media (max-width: 640px) {
+    .content {
+      padding: 5rem 1rem 3rem;
     }
 
-    .blog-hero {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding: 1rem 0;
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    .blog-title {
-      font-size: 2.75rem;
-      line-height: 1.1;
-      margin-bottom: 0.75rem;
-    }
-
-    .blog-subtitle {
-      font-size: 1.125rem;
-      line-height: 1.4;
-      max-width: 100%;
-      padding: 0 0.5rem;
-    }
-
-    .blog-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .search-filters-section {
-      margin-bottom: 2rem;
-      padding: 0 0.5rem;
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    .search-container {
-      margin-bottom: 1.5rem;
-      max-width: 100%;
-    }
-
-    .search-input {
-      font-size: 1rem;
-      padding: 0.875rem 1rem 0.875rem 3rem;
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .search-icon {
-      left: 1rem;
-    }
-
-    .filters-container {
+    .post-link {
+      flex-direction: column;
       gap: 0.5rem;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      max-width: 100%;
-      overflow-x: hidden;
     }
 
-    .filter-group {
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      padding-bottom: 0.5rem;
-      gap: 0.5rem;
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    .filter-btn {
-      white-space: nowrap;
-      flex-shrink: 1;
-      font-size: 0.8rem;
-      padding: 0.5rem 0.75rem;
-      min-width: auto;
-      max-width: calc(50% - 0.25rem);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .blog-main {
-      padding: 0.5rem;
-      max-width: 100vw;
-      overflow-x: hidden;
-    }
-
-    .blog-hero {
-      margin-bottom: 1.5rem;
-      padding: 0.75rem 0;
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
-    .blog-title {
-      font-size: 2.25rem;
-      line-height: 1.1;
-    }
-
-    .blog-subtitle {
-      font-size: 1rem;
-      line-height: 1.3;
-    }
-
-    .search-filters-section {
-      margin-bottom: 1.5rem;
-      padding: 0 0.25rem;
-    }
-
-    .search-input {
-      font-size: 1rem;
-      padding: 0.875rem 1rem 0.875rem 3rem;
-    }
-
-    .search-icon {
-      left: 1rem;
-      width: 1.25rem;
-      height: 1.25rem;
-    }
-
-    .filter-btn {
-      font-size: 0.875rem;
-      padding: 0.5rem 0.75rem;
+    .post-date {
+      font-size: 0.8125rem;
     }
   }
 </style>
-
-<script>
-  // Filter functionality
-  document.addEventListener('DOMContentLoaded', function () {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const featuredPost = document.querySelector(
-      '.featured-post'
-    ) as HTMLElement | null;
-    const blogItems = document.querySelectorAll(
-      '.blog-grid-item'
-    ) as NodeListOf<HTMLElement>;
-    const noResults = document.getElementById(
-      'no-results'
-    ) as HTMLElement | null;
-    const blogLayout = document.getElementById(
-      'blog-layout'
-    ) as HTMLElement | null;
-
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', function (this: HTMLElement) {
-        // Update active state
-        filterBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-
-        const filter = this.dataset.filter;
-
-        // Filter featured post
-        let featuredVisible = false;
-        if (featuredPost && filter) {
-          const featuredTags = featuredPost.dataset.tags || '';
-          const shouldShowFeatured =
-            filter === 'all' || featuredTags.includes(filter);
-
-          if (shouldShowFeatured) {
-            featuredPost.style.display = 'block';
-            featuredPost.style.animation = 'slideInUp 0.6s ease-out forwards';
-            featuredVisible = true;
-          } else {
-            featuredPost.style.display = 'none';
-          }
-        }
-
-        // Filter grid items
-        let visibleCount = 0;
-        if (filter) {
-          blogItems.forEach(item => {
-            const tags = item.dataset.tags || '';
-            const shouldShow = filter === 'all' || tags.includes(filter);
-
-            if (shouldShow) {
-              item.style.display = '';
-              item.style.animation = 'slideInUp 0.6s ease-out forwards';
-              visibleCount++;
-            } else {
-              item.style.display = 'none';
-            }
-          });
-        }
-
-        // Show/hide no results
-        const totalVisible = (featuredVisible ? 1 : 0) + visibleCount;
-        if (totalVisible === 0) {
-          if (noResults) noResults.style.display = 'block';
-          if (blogLayout) blogLayout.style.display = 'none';
-        } else {
-          if (noResults) noResults.style.display = 'none';
-          if (blogLayout) blogLayout.style.display = 'flex';
-        }
-      });
-    });
-  });
-
-  // Initialize scroll animations for this page
-  function initPageScrollAnimations() {
-    // First, ensure all elements start hidden
-    const elements = document.querySelectorAll('.scroll-animate');
-
-    elements.forEach(element => {
-      // Remove any existing animate-in class and ensure element is hidden
-      element.classList.remove('animate-in');
-    });
-
-    if (!('IntersectionObserver' in window)) {
-      elements.forEach(element => {
-        element.classList.add('animate-in');
-      });
-      return;
-    }
-
-    // Wait a moment before starting observations to ensure elements are properly hidden
-    setTimeout(() => {
-      const observer = new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('animate-in');
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        {
-          threshold: 0.1,
-          rootMargin: '0px 0px -50px 0px',
-        }
-      );
-
-      elements.forEach(element => {
-        observer.observe(element);
-      });
-    }, 100);
-  }
-
-  // Fix mobile scrolling issues
-  function fixMobilePageScrolling() {
-    // Ensure the page can scroll on mobile
-    document.body.style.overflowY = 'auto';
-    document.documentElement.style.overflowY = 'auto';
-
-    // Force a reflow to ensure proper height calculation
-    document.body.offsetHeight;
-
-    // Ensure main content area is scrollable
-    const main = document.querySelector('main');
-    if (main) {
-      main.style.minHeight = '100vh';
-      main.style.overflowY = 'visible';
-    }
-  }
-
-  // Initialize when page loads
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      fixMobilePageScrolling();
-      initPageScrollAnimations();
-    });
-  } else {
-    fixMobilePageScrolling();
-    initPageScrollAnimations();
-  }
-</script>

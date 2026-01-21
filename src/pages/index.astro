@@ -1,23 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
-import BlogCard from '../components/BlogCard.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import StructuredData from '../components/StructuredData.astro';
 import { getCollection } from 'astro:content';
 import { SITE_TITLE } from '../consts';
 
-// Get latest blog posts and featured projects
+// Get latest blog posts and projects
 const allBlogPosts = await getCollection('blog');
 const allProjects = await getCollection('projects');
 
-// Sort blog posts by date and get the latest 3
+// Sort blog posts by date and get the latest 5
 const latestPosts = allBlogPosts
   .filter(post => !post.data.draft)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
-  .slice(0, 3);
+  .slice(0, 5);
 
-// Get featured projects
+// Get featured or recent projects
 const featuredProjects = allProjects
   .filter(project => project.data.featured)
   .slice(0, 4);
@@ -25,257 +24,189 @@ const featuredProjects = allProjects
 
 <BaseLayout
   title={SITE_TITLE}
-  description="Senior Data Scientist at BP specializing in oil & gas, machine learning model deployment, and full-stack data science solutions with extensive homelab infrastructure experience."
+  description="Data scientist at BP recently doing more forward deployed engineering work. Building ML systems, tinkering with homelabs, and occasionally writing about it."
 >
   <StructuredData type="website" data={{}} />
   <Hero />
 
-  <main class="main-content">
+  <main class="content">
     <section class="section">
-      <div class="section-header scroll-animate" style="animation-delay: 0s">
-        <h2>Featured Projects</h2>
-        <p>Some of my recent work and side projects</p>
-      </div>
-
-      {
-        featuredProjects.length > 0 ? (
-          <div class="projects-grid">
-            {featuredProjects.map((project, index) => (
-              <div
-                class="scroll-animate"
-                style={`animation-delay: ${(index + 1) * 0.1}s`}
-              >
-                <ProjectCard project={project} featured={index === 0} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div class="empty-state scroll-animate" style="animation-delay: 0.1s">
-            <p>No featured projects yet. Check back soon!</p>
-            <a href="/projects" class="btn btn-primary">
-              View All Projects
-            </a>
-          </div>
-        )
-      }
-
-      <div
-        class="section-footer scroll-animate"
-        style={`animation-delay: ${(featuredProjects.length + 1) * 0.1}s`}
-      >
-        <a href="/projects" class="btn btn-secondary">View All Projects</a>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header scroll-animate" style="animation-delay: 0s">
-        <h2>Latest Blog Posts</h2>
-        <p>Thoughts on development, technology, and more</p>
-      </div>
-
+      <h2 class="section-title">Writing</h2>
       {
         latestPosts.length > 0 ? (
-          <div class="blog-grid">
-            {latestPosts.map((post, index) => (
-              <div
-                class="scroll-animate"
-                style={`animation-delay: ${(index + 1) * 0.1}s`}
-              >
-                <BlogCard post={post} featured={index === 0} />
-              </div>
+          <ul class="post-list">
+            {latestPosts.map(post => (
+              <li class="post-item">
+                <a href={`/blog/${post.slug}`} class="post-link">
+                  <span class="post-title">{post.data.title}</span>
+                  <span class="post-date">
+                    <FormattedDate date={post.data.pubDate} />
+                  </span>
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : (
-          <div class="empty-state scroll-animate" style="animation-delay: 0.1s">
-            <p>No blog posts yet. Check back soon!</p>
-            <a href="/blog" class="btn btn-primary">
-              View All Posts
-            </a>
-          </div>
+          <p class="empty-message">No posts yet.</p>
         )
       }
+      <a href="/blog" class="view-all">All posts →</a>
+    </section>
 
-      <div
-        class="section-footer scroll-animate"
-        style={`animation-delay: ${(latestPosts.length + 1) * 0.1}s`}
-      >
-        <a href="/blog" class="btn btn-secondary">View All Posts</a>
-      </div>
+    <section class="section">
+      <h2 class="section-title">Projects</h2>
+      {
+        featuredProjects.length > 0 ? (
+          <ul class="project-list">
+            {featuredProjects.map(project => (
+              <li class="project-item">
+                <a
+                  href={project.data.link || `/projects/${project.slug}`}
+                  class="project-link"
+                  target={project.data.link ? '_blank' : undefined}
+                  rel={project.data.link ? 'noopener' : undefined}
+                >
+                  <span class="project-title">{project.data.title}</span>
+                  <span class="project-description">
+                    {project.data.description}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty-message">No projects yet.</p>
+        )
+      }
+      <a href="/projects" class="view-all">All projects →</a>
     </section>
   </main>
-
-  <style>
-    .main-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .section {
-      margin: 2.5rem 0;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .section-header h2 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin: 0 0 1rem 0;
-      color: var(--text-primary);
-    }
-
-    .section-header p {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-
-    .projects-grid,
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .section-footer {
-      text-align: center;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--text-secondary);
-    }
-
-    .empty-state p {
-      font-size: 1.125rem;
-      margin: 0 0 1.5rem 0;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      border: 2px solid transparent;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .btn-secondary:hover {
-      background: var(--accent);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    /* Dark mode styles */
-    :global(.dark) .section-header h2 {
-      color: white;
-    }
-
-    :global(.dark) .section-header p {
-      color: rgb(209, 213, 219);
-    }
-
-    :global(.dark) .empty-state {
-      color: rgb(156, 163, 175);
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .main-content {
-        padding: 0 1rem;
-      }
-
-      .section {
-        margin: 2rem 0;
-      }
-
-      .section-header h2 {
-        font-size: 2rem;
-      }
-
-      .projects-grid,
-      .blog-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-    }
-  </style>
-
-  <script>
-    // Initialize scroll animations for homepage
-    function initHomepageScrollAnimations() {
-      // First, ensure all elements start hidden
-      const elements = document.querySelectorAll('.scroll-animate');
-
-      elements.forEach(element => {
-        // Remove any existing animate-in class and ensure element is hidden
-        element.classList.remove('animate-in');
-      });
-
-      if (!('IntersectionObserver' in window)) {
-        elements.forEach(element => {
-          element.classList.add('animate-in');
-        });
-        return;
-      }
-
-      // Wait a moment before starting observations to ensure elements are properly hidden
-      setTimeout(() => {
-        const observer = new IntersectionObserver(
-          entries => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px',
-          }
-        );
-
-        elements.forEach(element => {
-          observer.observe(element);
-        });
-      }, 100);
-    }
-
-    // Initialize when page loads
-    if (document.readyState === 'loading') {
-      document.addEventListener(
-        'DOMContentLoaded',
-        initHomepageScrollAnimations
-      );
-    } else {
-      initHomepageScrollAnimations();
-    }
-  </script>
 </BaseLayout>
+
+<style>
+  .content {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+  }
+
+  /* Post list styles */
+  .post-list,
+  .project-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+  }
+
+  .post-item,
+  .project-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-item:last-child,
+  .project-item:last-child {
+    border-bottom: none;
+  }
+
+  .post-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    text-decoration: none;
+  }
+
+  .post-link:hover .post-title {
+    color: var(--accent);
+  }
+
+  .post-title {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.4;
+    transition: color 0.15s ease;
+  }
+
+  .post-date {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Project list styles */
+  .project-link {
+    display: block;
+    padding: 0.75rem 0;
+    text-decoration: none;
+  }
+
+  .project-link:hover .project-title {
+    color: var(--accent);
+  }
+
+  .project-title {
+    display: block;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    transition: color 0.15s ease;
+  }
+
+  .project-description {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .view-all {
+    display: inline-block;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .view-all:hover {
+    color: var(--accent);
+  }
+
+  .empty-message {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    margin: 0 0 1rem 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .content {
+      padding: 0 1rem 3rem;
+    }
+
+    .post-link {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .post-date {
+      font-size: 0.8125rem;
+    }
+  }
+</style>
