@@ -193,9 +193,9 @@ jobs:
       - name: Security Scan
         run: |
           mkdir -p $HOME/bin
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.48.0
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.58.0
           echo "Scanning image for vulnerabilities..."
-          $HOME/bin/trivy image --severity HIGH,CRITICAL personal-site:ci || echo "Vulnerabilities found in image"
+          $HOME/bin/trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 personal-site:ci
 
       - name: Clean up Docker resources
         if: always()
@@ -297,15 +297,15 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          release_name: Personal Site v${{ steps.version.outputs.version }}
+          name: Personal Site v${{ steps.version.outputs.version }}
           body: ${{ steps.release_notes.outputs.release_body }}
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean up Docker resources
         if: always()
