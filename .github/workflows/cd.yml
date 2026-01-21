@@ -3,8 +3,6 @@ name: CD Pipeline
 on:
   push:
     branches: [main]
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -83,10 +81,7 @@ jobs:
     runs-on: [self-hosted, Linux]
     if: |
       always() && (
-        github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.check-and-tag.outputs.should-deploy == 'true'
-      ) || (
-        github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-      ) || (
+        (github.event_name == 'push' && needs.check-and-tag.outputs.should-deploy == 'true') ||
         github.event_name == 'workflow_dispatch'
       )
     steps:
@@ -254,16 +249,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Extract version from tag
+      - name: Extract version
         id: version
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            # Extract version from git tag (remove 'v' prefix)
-            VERSION=${GITHUB_REF#refs/tags/v}
-          else
-            # For main branch pushes, get version from VERSION file
-            VERSION=$(cat VERSION | tr -d ' \t\n\r')
-          fi
+          VERSION=$(cat VERSION | tr -d ' \t\n\r')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Release version: $VERSION"
 
