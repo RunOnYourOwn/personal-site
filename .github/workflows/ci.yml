@@ -58,3 +58,146 @@ jobs:
           echo "Cleaning up workspace for self-hosted runner..."
           rm -rf $GITHUB_WORKSPACE/*
           rm -rf node_modules || true
+
+  build-container:
+    name: Build Docker Image
+    needs: test
+    runs-on: [self-hosted, Linux]
+    steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (local)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: personal-site:ci
+
+      - name: Save image
+        run: docker save personal-site:ci -o personal-site-image.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: personal-site-image
+          path: personal-site-image.tar
+
+      - name: Clean up Docker resources
+        if: always()
+        run: |
+          echo "Cleaning up Docker resources..."
+          docker system prune -f --volumes || true
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -f personal-site-image.tar || true
+
+  test-container:
+    name: Test Container
+    needs: build-container
+    runs-on: [self-hosted, Linux]
+    steps:
+      - name: Pre-checkout cleanup
+        run: |
+          echo "Cleaning workspace before checkout..."
+          rm -rf $GITHUB_WORKSPACE/* || true
+          rm -rf $GITHUB_WORKSPACE/.git || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: personal-site-image
+
+      - name: Load image
+        run: docker load -i personal-site-image.tar
+
+      - name: Test Container
+        run: |
+          # Start the container with environment variables
+          docker run -d --name test-personal-site -p 8080:80 -e UMAMI_URL=https://umami.aaronbrazier.com personal-site:ci
+
+          # Wait for container to be healthy (up to 60 seconds)
+          echo "Waiting for container to be healthy..."
+          for i in {1..30}; do
+            if curl -sf http://localhost:8080/healthz > /dev/null 2>&1; then
+              echo "Container is healthy after $((i*2)) seconds"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Container failed to become healthy"
+              docker logs test-personal-site
+              exit 1
+            fi
+            sleep 2
+          done
+
+          # Test health endpoint
+          echo "Testing health endpoint..."
+          curl -f http://localhost:8080/healthz || { echo "Health endpoint test failed"; exit 1; }
+
+          # Test main page with content verification
+          echo "Testing main page..."
+          response=$(curl -sf http://localhost:8080/)
+          echo "$response" | grep -q "<title>" || { echo "Main page missing title tag"; exit 1; }
+          echo "Main page OK"
+
+          # Test blog page
+          echo "Testing blog page..."
+          response=$(curl -sf http://localhost:8080/blog/)
+          echo "$response" | grep -q "<title>" || { echo "Blog page missing title tag"; exit 1; }
+          echo "Blog page OK"
+
+          # Test projects page
+          echo "Testing projects page..."
+          response=$(curl -sf http://localhost:8080/projects/)
+          echo "$response" | grep -q "<title>" || { echo "Projects page missing title tag"; exit 1; }
+          echo "Projects page OK"
+
+          echo "All container tests passed!"
+
+          # Clean up
+          docker stop test-personal-site
+          docker rm test-personal-site
+
+      - name: Security Scan
+        run: |
+          mkdir -p $HOME/bin
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.58.0
+          echo "Scanning image for vulnerabilities..."
+          $HOME/bin/trivy image --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 personal-site:ci
+
+      - name: Clean up Docker resources
+        if: always()
+        run: |
+          echo "Cleaning up Docker resources..."
+          docker stop test-personal-site 2>/dev/null || true
+          docker rm test-personal-site 2>/dev/null || true
+          docker system prune -f --volumes || true
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleaning up workspace for self-hosted runner..."
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -f personal-site-image.tar || true

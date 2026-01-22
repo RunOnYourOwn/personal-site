@@ -9,10 +9,6 @@ on:
         description: 'Force deploy without version check'
         type: boolean
         default: false
-      skip_tests:
-        description: 'Skip container tests and security scan (emergency only)'
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -30,8 +26,6 @@ jobs:
     outputs:
       should-deploy: ${{ steps.check-version.outputs.should-deploy }}
       version: ${{ steps.check-version.outputs.version }}
-      force-deploy: ${{ github.event.inputs.force_deploy }}
-      skip-tests: ${{ github.event.inputs.skip_tests }}
     steps:
       - name: Pre-checkout cleanup
         run: |
@@ -96,166 +90,14 @@ jobs:
           echo "Cleaning up workspace for self-hosted runner..."
           rm -rf $GITHUB_WORKSPACE/*
 
-  build:
-    name: Build Docker Image
+  publish:
+    name: Build and Publish to GHCR
     needs: check-and-tag
     runs-on: [self-hosted, Linux]
     if: |
       always() && (
         (github.event_name == 'push' && needs.check-and-tag.outputs.should-deploy == 'true') ||
         github.event_name == 'workflow_dispatch'
-      )
-    steps:
-      - name: Pre-checkout cleanup
-        run: |
-          echo "Cleaning workspace before checkout..."
-          rm -rf $GITHUB_WORKSPACE/* || true
-          rm -rf $GITHUB_WORKSPACE/.git || true
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build image (local)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
-          load: true
-          tags: personal-site:ci
-
-      - name: Save image
-        run: docker save personal-site:ci -o personal-site-image.tar
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
-        with:
-          name: personal-site-image
-          path: personal-site-image.tar
-
-      - name: Clean up Docker resources
-        if: always()
-        run: |
-          echo "Cleaning up Docker resources..."
-          docker system prune -f --volumes || true
-
-      - name: Cleanup workspace
-        if: always()
-        run: |
-          echo "Cleaning up workspace for self-hosted runner..."
-          rm -rf $GITHUB_WORKSPACE/*
-          rm -f personal-site-image.tar || true
-
-  test-container:
-    name: Test Container
-    needs: [check-and-tag, build]
-    runs-on: [self-hosted, Linux]
-    if: |
-      always() &&
-      needs.build.result == 'success' &&
-      needs.check-and-tag.outputs.skip-tests != 'true'
-    steps:
-      - name: Pre-checkout cleanup
-        run: |
-          echo "Cleaning workspace before checkout..."
-          rm -rf $GITHUB_WORKSPACE/* || true
-          rm -rf $GITHUB_WORKSPACE/.git || true
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Download image
-        uses: actions/download-artifact@v4
-        with:
-          name: personal-site-image
-
-      - name: Load image
-        run: docker load -i personal-site-image.tar
-
-      - name: Test Container
-        run: |
-          # Start the container with environment variables
-          docker run -d --name test-personal-site -p 8080:80 -e UMAMI_URL=https://umami.aaronbrazier.com personal-site:ci
-
-          # Wait for container to be healthy (up to 60 seconds)
-          echo "Waiting for container to be healthy..."
-          for i in {1..30}; do
-            if curl -sf http://localhost:8080/healthz > /dev/null 2>&1; then
-              echo "Container is healthy after $((i*2)) seconds"
-              break
-            fi
-            if [ $i -eq 30 ]; then
-              echo "Container failed to become healthy"
-              docker logs test-personal-site
-              exit 1
-            fi
-            sleep 2
-          done
-
-          # Test health endpoint
-          echo "Testing health endpoint..."
-          curl -f http://localhost:8080/healthz || { echo "Health endpoint test failed"; exit 1; }
-
-          # Test main page with content verification
-          echo "Testing main page..."
-          response=$(curl -sf http://localhost:8080/)
-          echo "$response" | grep -q "<title>" || { echo "Main page missing title tag"; exit 1; }
-          echo "Main page OK"
-
-          # Test blog page
-          echo "Testing blog page..."
-          response=$(curl -sf http://localhost:8080/blog/)
-          echo "$response" | grep -q "<title>" || { echo "Blog page missing title tag"; exit 1; }
-          echo "Blog page OK"
-
-          # Test projects page
-          echo "Testing projects page..."
-          response=$(curl -sf http://localhost:8080/projects/)
-          echo "$response" | grep -q "<title>" || { echo "Projects page missing title tag"; exit 1; }
-          echo "Projects page OK"
-
-          echo "All container tests passed!"
-
-          # Clean up
-          docker stop test-personal-site
-          docker rm test-personal-site
-
-      - name: Security Scan
-        run: |
-          mkdir -p $HOME/bin
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin v0.58.0
-          echo "Scanning image for vulnerabilities..."
-          $HOME/bin/trivy image --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 personal-site:ci
-
-      - name: Clean up Docker resources
-        if: always()
-        run: |
-          echo "Cleaning up Docker resources..."
-          docker stop test-personal-site 2>/dev/null || true
-          docker rm test-personal-site 2>/dev/null || true
-          docker system prune -f --volumes || true
-
-      - name: Cleanup workspace
-        if: always()
-        run: |
-          echo "Cleaning up workspace for self-hosted runner..."
-          rm -rf $GITHUB_WORKSPACE/*
-          rm -f personal-site-image.tar || true
-
-  publish:
-    name: Publish to GHCR
-    needs: [check-and-tag, build, test-container]
-    runs-on: [self-hosted, Linux]
-    if: |
-      always() && (
-        needs.test-container.result == 'success' ||
-        (needs.check-and-tag.outputs.skip-tests == 'true' && needs.build.result == 'success')
       )
     steps:
       - name: Pre-checkout cleanup
@@ -335,11 +177,11 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Personal Site v${{ steps.version.outputs.version }}
-          body: ${{ steps.release_notes.outputs.release_body }}
+          name: v${{ steps.version.outputs.version }}
+          body_path: release_body.md
           draft: false
           prerelease: false
         env:
@@ -356,26 +198,34 @@ jobs:
         run: |
           echo "Cleaning up workspace for self-hosted runner..."
           rm -rf $GITHUB_WORKSPACE/*
-          rm -f release_body.md || true
 
   deploy:
-    name: Deploy via Portainer
-    needs: publish
+    name: Deploy to Production
+    needs: [check-and-tag, publish]
     runs-on: [self-hosted, Linux]
-    if: always() && needs.publish.result == 'success'
+    if: needs.publish.result == 'success'
     steps:
-      - name: Trigger Portainer Redeploy
-        env:
-          PORTAINER_URL: ${{ secrets.PORTAINER_URL }}
-          API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+      - name: Trigger Portainer webhook
         run: |
-          if [ -n "$PORTAINER_URL" ] && [ -n "$API_KEY" ]; then
-            echo "Triggering Portainer stack redeploy..."
-            curl -X PUT "$PORTAINER_URL" \
-              -H "X-API-Key: $API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{"pullImage": true}' \
-              && echo "Redeploy triggered successfully" || echo "Redeploy failed"
-          else
-            echo "PORTAINER_URL or PORTAINER_API_KEY not set, skipping deployment"
-          fi
+          echo "Triggering Portainer deployment webhook..."
+          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+          echo "Deployment triggered successfully"
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for deployment to complete..."
+          sleep 30
+
+          # Check if site is responding
+          for i in {1..6}; do
+            if curl -sf https://aaronbrazier.com/healthz > /dev/null 2>&1; then
+              echo "Site is healthy after deployment"
+              exit 0
+            fi
+            echo "Attempt $i: Site not ready yet, waiting..."
+            sleep 10
+          done
+
+          echo "Warning: Site health check timed out, but deployment may still be in progress"

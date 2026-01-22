@@ -57,7 +57,7 @@ git checkout -b my-feature
 # 3. Push and create PR
 git push origin my-feature
 
-# 4. Merge PR — CI/CD handles the rest
+# 4. Merge PR - CI/CD handles the rest
 ```
 
 ## Docker
