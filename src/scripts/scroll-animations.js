@@ -1,4 +1,3 @@
-/* eslint-env browser */
 /* global window, document, IntersectionObserver, setTimeout */
 // Scroll-triggered animations using Intersection Observer
 class ScrollAnimations {

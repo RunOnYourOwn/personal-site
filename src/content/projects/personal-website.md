@@ -1,6 +1,6 @@
 ---
 title: 'Personal Website'
-description: 'This site—built with Astro and deployed on my homelab.'
+description: 'This site - built with Astro and deployed on my homelab.'
 repo: 'https://github.com/runonyourown/personal-site'
 year: 2025
 tags: ['Astro', 'TypeScript', 'Docker', 'CI/CD']
@@ -8,7 +8,7 @@ featured: true
 status: 'completed'
 ---
 
-I built this site because I wanted something simple that I could actually maintain. No CMS, no complicated framework—just markdown files and a static site generator.
+I built this site because I wanted something simple that I could actually maintain. No CMS, no complicated framework - just markdown files and a static site generator.
 
 ## How It Works
 

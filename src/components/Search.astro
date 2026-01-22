@@ -152,7 +152,7 @@ const { placeholder = 'Search posts and projects...', searchData = [] } =
         initializeSearch(fuse);
       } catch (error) {}
     })
-    .catch(error => {
+    .catch(() => {
       // Show error message to user
       const searchInput = document.getElementById('search-input');
       if (searchInput) {
