@@ -205,13 +205,21 @@ jobs:
     runs-on: [self-hosted, Linux]
     if: needs.publish.result == 'success'
     steps:
-      - name: Trigger Portainer webhook
+      - name: Trigger Portainer Redeploy
+        env:
+          PORTAINER_URL: ${{ secrets.PORTAINER_URL }}
+          API_KEY: ${{ secrets.PORTAINER_API_KEY }}
         run: |
-          echo "Triggering Portainer deployment webhook..."
-          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            --fail --silent --show-error
-          echo "Deployment triggered successfully"
+          if [ -n "$PORTAINER_URL" ] && [ -n "$API_KEY" ]; then
+            echo "Triggering Portainer stack redeploy..."
+            curl -X PUT "$PORTAINER_URL" \
+              -H "X-API-Key: $API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"pullImage": true}' \
+              && echo "Redeploy triggered successfully" || echo "Redeploy failed"
+          else
+            echo "PORTAINER_URL or PORTAINER_API_KEY not set, skipping deployment"
+          fi
 
       - name: Verify deployment
         run: |
