@@ -17,6 +17,7 @@ const BLOCKED_ARTISTS = [
   'The Laurie Berkner Band',
   'Mandy Moore',
   'Super Simple Songs',
+  "Gabby's Dollhouse",
 
   // Add more here as needed
 ];

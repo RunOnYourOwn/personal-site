@@ -29,6 +29,7 @@ const BLOCKED_ARTISTS = [
   'The Laurie Berkner Band',
   'Super Simple Songs',
   'Bruce Channell',
+  "Gabby's Dollhouse",
   // Add more here as needed
 ];
 
