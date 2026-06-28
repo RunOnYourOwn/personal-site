@@ -68,8 +68,11 @@ jobs:
           fi
 
       - name: Log in to Forgejo registry
+        # Use an explicit user + a package:write PAT. The built-in GITHUB_TOKEN
+        # failed here with a 401 on blob upload (dispatch actor resolves empty →
+        # anonymous login, and the auto-token isn't reliably package:write).
         if: steps.ver.outputs.build == 'true'
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login git.aaronbrazier.com -u "${{ github.actor }}" --password-stdin
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login git.aaronbrazier.com -u zerocool --password-stdin
 
       - name: Build + push to Forgejo registry (deploy source of truth)
         if: steps.ver.outputs.build == 'true'
