@@ -44,3 +44,8 @@ DEPLOYMENT_GUIDE.md
 DEPLOYMENT.md
 
 umami-db-data/
+
+# iCloud / Finder copy-conflict artifacts (never commit)
+* 2.*
+* 2
+* 2/

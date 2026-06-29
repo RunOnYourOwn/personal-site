@@ -1,22 +1,17 @@
-# CD — build the site image on a version bump, push to the Forgejo registry
-# (deploy source of truth) + GHCR (public mirror), then bump the image tag in
-# homelab-apps so Komodo redeploys (GitOps). Replaces the GitHub-Actions →
-# Portainer-webhook pipeline.
+# CD — build the site image on a version bump, push to the private container
+# registry (deploy source of truth) + a public mirror, then bump the image tag
+# in the deploy repo so the orchestrator redeploys (GitOps).
 #
-# Flow:
-#   push to main → if VERSION has no tag yet → build linux/amd64
-#   → push git.aaronbrazier.com/runonyourown/personal-site:vX.Y.Z + :latest
-#   → push ghcr.io/runonyourown/personal-site:vX.Y.Z + :latest (best-effort mirror)
-#   → tag vX.Y.Z in this repo
-#   → bump apps/personal-site/compose.yaml `app.image` tag in homelab-apps@main
-#   → Komodo (auto_pull + webhook) redeploys on pve-website
-#
-# Required Forgejo repo secrets (Settings → Actions → Secrets):
-#   GHCR_TOKEN              GitHub PAT, packages:write — for the public GHCR mirror push
-#   HOMELAB_APPS_TOKEN      Forgejo PAT, write to runonyourown/homelab-apps — for the GitOps tag bump
-# (Forgejo's built-in ${{ secrets.GITHUB_TOKEN }} covers the Forgejo registry push.)
-#
-# Runner: self-hosted `homelab-infra` (has the docker CLI; same runner homelab-apps CI uses).
+# Host/repo/registry specifics are kept out of this (publicly-mirrored) file via
+# Forgejo Actions variables:
+#   vars.REGISTRY_HOST   private container registry host
+#   vars.IMAGE_PATH      <namespace>/<image>
+#   vars.REGISTRY_USER   registry login user
+#   vars.DEPLOY_REPO     <namespace>/<repo> holding the deploy compose
+# Secrets (set in repo settings):
+#   REGISTRY_TOKEN       registry login (package:write) for the private registry
+#   GHCR_TOKEN           GitHub PAT (write:packages) for the public mirror push
+#   HOMELAB_APPS_TOKEN   token with write to the deploy repo (GitOps tag bump)
 
 name: CD
 on:
@@ -34,8 +29,8 @@ concurrency:
   cancel-in-progress: false # never cancel a deploy mid-flight
 
 env:
-  FORGEJO_IMAGE: git.aaronbrazier.com/runonyourown/personal-site
-  GHCR_IMAGE: ghcr.io/runonyourown/personal-site
+  REGISTRY_IMAGE: ${{ vars.REGISTRY_HOST }}/${{ vars.IMAGE_PATH }}
+  GHCR_IMAGE: ghcr.io/${{ vars.IMAGE_PATH }}
 
 jobs:
   build-deploy:
@@ -67,14 +62,11 @@ jobs:
             echo "build=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Log in to Forgejo registry
-        # Use an explicit user + a package:write PAT. The built-in GITHUB_TOKEN
-        # failed here with a 401 on blob upload (dispatch actor resolves empty →
-        # anonymous login, and the auto-token isn't reliably package:write).
+      - name: Log in to the private registry
         if: steps.ver.outputs.build == 'true'
-        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login git.aaronbrazier.com -u zerocool --password-stdin
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${{ vars.REGISTRY_HOST }}" -u "${{ vars.REGISTRY_USER }}" --password-stdin
 
-      - name: Build + push to Forgejo registry (deploy source of truth)
+      - name: Build + push to the private registry (deploy source of truth)
         if: steps.ver.outputs.build == 'true'
         run: |
           set -euo pipefail
@@ -82,19 +74,19 @@ jobs:
           docker build \
             --build-arg VERSION="$V" \
             --build-arg VCS_REF="${{ github.sha }}" \
-            -t "$FORGEJO_IMAGE:v$V" -t "$FORGEJO_IMAGE:latest" .
-          docker push "$FORGEJO_IMAGE:v$V"
-          docker push "$FORGEJO_IMAGE:latest"
+            -t "$REGISTRY_IMAGE:v$V" -t "$REGISTRY_IMAGE:latest" .
+          docker push "$REGISTRY_IMAGE:v$V"
+          docker push "$REGISTRY_IMAGE:latest"
 
       - name: Mirror image to GHCR (public, best-effort)
         if: steps.ver.outputs.build == 'true'
-        continue-on-error: true # a GHCR hiccup must never block the deploy
+        continue-on-error: true # a mirror hiccup must never block the deploy
         run: |
           set -euo pipefail
           V="${{ steps.ver.outputs.version }}"
-          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          docker tag "$FORGEJO_IMAGE:v$V" "$GHCR_IMAGE:v$V"
-          docker tag "$FORGEJO_IMAGE:latest" "$GHCR_IMAGE:latest"
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ vars.REGISTRY_USER }}" --password-stdin
+          docker tag "$REGISTRY_IMAGE:v$V" "$GHCR_IMAGE:v$V"
+          docker tag "$REGISTRY_IMAGE:latest" "$GHCR_IMAGE:latest"
           docker push "$GHCR_IMAGE:v$V"
           docker push "$GHCR_IMAGE:latest"
 
@@ -104,29 +96,28 @@ jobs:
           set -euo pipefail
           V="${{ steps.ver.outputs.version }}"
           git config user.name  "forgejo-actions"
-          git config user.email "actions@git.aaronbrazier.com"
+          git config user.email "forgejo-actions@noreply.local"
           git tag -a "v$V" -m "Release v$V" || true
           git push origin "v$V" || true
 
-      - name: GitOps — bump image tag in homelab-apps (triggers Komodo)
+      - name: GitOps — bump image tag in the deploy repo (triggers redeploy)
         if: steps.ver.outputs.build == 'true'
         run: |
           set -euo pipefail
           V="${{ steps.ver.outputs.version }}"
-          rm -rf _ha && git clone --depth 1 \
-            "https://forgejo-actions:${{ secrets.HOMELAB_APPS_TOKEN }}@git.aaronbrazier.com/runonyourown/homelab-apps.git" _ha
-          cd _ha
+          rm -rf _deploy && git clone --depth 1 \
+            "https://forgejo-actions:${{ secrets.HOMELAB_APPS_TOKEN }}@${{ vars.REGISTRY_HOST }}/${{ vars.DEPLOY_REPO }}.git" _deploy
+          cd _deploy
           F="apps/personal-site/compose.yaml"
-          # Repoint the app image to the new tag (idempotent).
-          sed -i -E "s|(image: git\.aaronbrazier\.com/runonyourown/personal-site:)[^[:space:]]+|\1v$V|" "$F"
+          sed -i -E "s|(image: ${{ vars.REGISTRY_HOST }}/${{ vars.IMAGE_PATH }}:)[^[:space:]]+|\1v$V|" "$F"
           if git diff --quiet "$F"; then
-            echo "compose already at v$V — no bump needed"
+            echo "deploy compose already at v$V — no bump needed"
           else
             git config user.name  "forgejo-actions"
-            git config user.email "actions@git.aaronbrazier.com"
+            git config user.email "forgejo-actions@noreply.local"
             git commit -qm "chore(personal-site): deploy v$V" "$F"
             git push origin main
-            echo "bumped personal-site → v$V; Komodo will redeploy"
+            echo "bumped personal-site → v$V"
           fi
 
       - name: Cleanup
