@@ -18,6 +18,7 @@ const BLOCKED_ARTISTS = [
   'Mandy Moore',
   'Super Simple Songs',
   "Gabby's Dollhouse",
+  'PAW Patrol',
 
   // Add more here as needed
 ];
