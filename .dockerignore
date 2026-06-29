@@ -66,3 +66,8 @@ CLAUDE.md
 .github/
 scripts/
 .claude/
+
+# iCloud / Finder copy-conflict artifacts (never ship in a local COPY . . build)
+* 2.*
+* 2
+* 2/
