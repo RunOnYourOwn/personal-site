@@ -1,0 +1,134 @@
+# CD — build the site image on a version bump, push to the Forgejo registry
+# (deploy source of truth) + GHCR (public mirror), then bump the image tag in
+# homelab-apps so Komodo redeploys (GitOps). Replaces the GitHub-Actions →
+# Portainer-webhook pipeline.
+#
+# Flow:
+#   push to main → if VERSION has no tag yet → build linux/amd64
+#   → push git.aaronbrazier.com/runonyourown/personal-site:vX.Y.Z + :latest
+#   → push ghcr.io/runonyourown/personal-site:vX.Y.Z + :latest (best-effort mirror)
+#   → tag vX.Y.Z in this repo
+#   → bump apps/personal-site/compose.yaml `app.image` tag in homelab-apps@main
+#   → Komodo (auto_pull + webhook) redeploys on pve-website
+#
+# Required Forgejo repo secrets (Settings → Actions → Secrets):
+#   GHCR_TOKEN              GitHub PAT, packages:write — for the public GHCR mirror push
+#   HOMELAB_APPS_TOKEN      Forgejo PAT, write to runonyourown/homelab-apps — for the GitOps tag bump
+# (Forgejo's built-in ${{ secrets.GITHUB_TOKEN }} covers the Forgejo registry push.)
+#
+# Runner: self-hosted `homelab-infra` (has the docker CLI; same runner homelab-apps CI uses).
+
+name: CD
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build + push even if the version tag already exists'
+        type: boolean
+        default: false
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false # never cancel a deploy mid-flight
+
+env:
+  FORGEJO_IMAGE: git.aaronbrazier.com/runonyourown/personal-site
+  GHCR_IMAGE: ghcr.io/runonyourown/personal-site
+
+jobs:
+  build-deploy:
+    runs-on: homelab-infra
+    steps:
+      - name: Bootstrap (node for JS actions + git)
+        run: |
+          set -euo pipefail
+          command -v node >/dev/null 2>&1 || { apt-get update -q && apt-get install -y -q nodejs; }
+          command -v git  >/dev/null 2>&1 || { apt-get update -q && apt-get install -y -q git; }
+
+      - name: Checkout
+        uses: https://github.com/actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version + whether to build
+        id: ver
+        run: |
+          set -euo pipefail
+          V=$(tr -d ' \t\n\r' < VERSION)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          elif git tag -l | grep -qx "v$V"; then
+            echo "build=false" >> "$GITHUB_OUTPUT"
+            echo "::notice ::v$V already tagged — nothing to deploy"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Log in to Forgejo registry
+        # Use an explicit user + a package:write PAT. The built-in GITHUB_TOKEN
+        # failed here with a 401 on blob upload (dispatch actor resolves empty →
+        # anonymous login, and the auto-token isn't reliably package:write).
+        if: steps.ver.outputs.build == 'true'
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login git.aaronbrazier.com -u zerocool --password-stdin
+
+      - name: Build + push to Forgejo registry (deploy source of truth)
+        if: steps.ver.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+          V="${{ steps.ver.outputs.version }}"
+          docker build \
+            --build-arg VERSION="$V" \
+            --build-arg VCS_REF="${{ github.sha }}" \
+            -t "$FORGEJO_IMAGE:v$V" -t "$FORGEJO_IMAGE:latest" .
+          docker push "$FORGEJO_IMAGE:v$V"
+          docker push "$FORGEJO_IMAGE:latest"
+
+      - name: Mirror image to GHCR (public, best-effort)
+        if: steps.ver.outputs.build == 'true'
+        continue-on-error: true # a GHCR hiccup must never block the deploy
+        run: |
+          set -euo pipefail
+          V="${{ steps.ver.outputs.version }}"
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag "$FORGEJO_IMAGE:v$V" "$GHCR_IMAGE:v$V"
+          docker tag "$FORGEJO_IMAGE:latest" "$GHCR_IMAGE:latest"
+          docker push "$GHCR_IMAGE:v$V"
+          docker push "$GHCR_IMAGE:latest"
+
+      - name: Tag the release in this repo
+        if: steps.ver.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+          V="${{ steps.ver.outputs.version }}"
+          git config user.name  "forgejo-actions"
+          git config user.email "actions@git.aaronbrazier.com"
+          git tag -a "v$V" -m "Release v$V" || true
+          git push origin "v$V" || true
+
+      - name: GitOps — bump image tag in homelab-apps (triggers Komodo)
+        if: steps.ver.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+          V="${{ steps.ver.outputs.version }}"
+          rm -rf _ha && git clone --depth 1 \
+            "https://forgejo-actions:${{ secrets.HOMELAB_APPS_TOKEN }}@git.aaronbrazier.com/runonyourown/homelab-apps.git" _ha
+          cd _ha
+          F="apps/personal-site/compose.yaml"
+          # Repoint the app image to the new tag (idempotent).
+          sed -i -E "s|(image: git\.aaronbrazier\.com/runonyourown/personal-site:)[^[:space:]]+|\1v$V|" "$F"
+          if git diff --quiet "$F"; then
+            echo "compose already at v$V — no bump needed"
+          else
+            git config user.name  "forgejo-actions"
+            git config user.email "actions@git.aaronbrazier.com"
+            git commit -qm "chore(personal-site): deploy v$V" "$F"
+            git push origin main
+            echo "bumped personal-site → v$V; Komodo will redeploy"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: docker image prune -f >/dev/null 2>&1 || true
