@@ -30,6 +30,7 @@ const BLOCKED_ARTISTS = [
   'Super Simple Songs',
   'Bruce Channell',
   "Gabby's Dollhouse",
+  'PAW Patrol',
   // Add more here as needed
 ];
 
