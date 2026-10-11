@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "astro check",
+    "test": "node --test src/lib/",
     "prepare": "husky",
     "version:check": "./scripts/prepare-release.sh current"
   },
