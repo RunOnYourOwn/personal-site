@@ -1,10 +1,19 @@
-/* global Buffer, Response, URLSearchParams, fetch, console */
+/* global fetch */
 import type { APIRoute } from 'astro';
+import {
+  degradedFromError,
+  degradedResponse,
+  getAccessToken,
+  jsonResponse,
+  UpstreamError,
+} from '../../../lib/spotify';
+
+const ROUTE = 'top-tracks';
+const CACHE_CONTROL = 'public, s-maxage=3600, stale-while-revalidate=1800';
 
 const USE_MOCK_DATA = false;
 
 const TOP_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/top/tracks';
-const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 
 // Artists to filter out (case-insensitive)
 // Tracks by these artists won't appear in your top lists
@@ -109,33 +118,6 @@ interface TopTracksResponse {
   timeRange: string;
 }
 
-async function getAccessToken(): Promise<string | null> {
-  const clientId = process.env.SPOTIFY_CLIENT_ID;
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
-
-  if (!clientId || !clientSecret || !refreshToken) {
-    return null;
-  }
-
-  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    }),
-  });
-
-  const data = await response.json();
-  return data.access_token;
-}
-
 function isBlockedArtist(artists: { name: string }[]): boolean {
   return artists.some(artist =>
     BLOCKED_ARTISTS.some(
@@ -148,7 +130,7 @@ async function getTopTracks(
   accessToken: string,
   timeRange: string = 'short_term',
   limit: number = 10
-): Promise<TopTracksResponse | null> {
+): Promise<TopTracksResponse> {
   // Fetch extra to account for filtered tracks
   const fetchLimit = Math.min(limit + BLOCKED_ARTISTS.length + 10, 50);
 
@@ -163,7 +145,7 @@ async function getTopTracks(
   });
 
   if (response.status !== 200) {
-    return null;
+    throw new UpstreamError('top-tracks', response.status);
   }
 
   const data = await response.json();
@@ -197,58 +179,19 @@ export const GET: APIRoute = async ({ url }) => {
   const limit = parseInt(url.searchParams.get('limit') || '10', 10);
 
   if (USE_MOCK_DATA) {
-    return new Response(JSON.stringify(MOCK_DATA), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
-      },
-    });
+    return jsonResponse(MOCK_DATA, CACHE_CONTROL);
   }
 
   try {
-    const accessToken = await getAccessToken();
-
-    if (!accessToken) {
-      return new Response(JSON.stringify(MOCK_DATA), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
-        },
-      });
+    const auth = await getAccessToken();
+    if (!auth.ok) {
+      return degradedResponse(ROUTE, auth.reason, auth.detail, MOCK_DATA);
     }
 
-    const data = await getTopTracks(accessToken, timeRange, limit);
-
-    if (!data) {
-      return new Response(JSON.stringify(MOCK_DATA), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
-        },
-      });
-    }
-
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
-      },
-    });
+    const data = await getTopTracks(auth.token, timeRange, limit);
+    return jsonResponse(data, CACHE_CONTROL);
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Spotify API error:', error);
-
-    return new Response(JSON.stringify(MOCK_DATA), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
-      },
-    });
+    return degradedFromError(ROUTE, error, MOCK_DATA);
   }
 };
 
