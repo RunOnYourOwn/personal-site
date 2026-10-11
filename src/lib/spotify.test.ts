@@ -5,6 +5,7 @@ import {
   degradedFromError,
   degradedResponse,
   getAccessToken,
+  resetTokenCache,
   UpstreamError,
 } from './spotify.ts';
 
@@ -33,6 +34,7 @@ function withEnv(
         else process.env[k] = saved[k];
       }
       mock.restoreAll();
+      resetTokenCache();
     }
   };
 }
@@ -126,5 +128,27 @@ test(
       {}
     ).json();
     assert.equal(internal.degradedReason, 'internal_error');
+  })
+);
+
+test(
+  'access token is reused until near expiry (one token call, not one per request)',
+  withEnv(SECRETS, async () => {
+    const fetchMock = mock.method(
+      globalThis,
+      'fetch',
+      async () =>
+        new Response(
+          JSON.stringify({ access_token: 'tok', expires_in: 3600 }),
+          {
+            status: 200,
+          }
+        )
+    );
+    const a = await getAccessToken();
+    const b = await getAccessToken();
+    assert.deepEqual(a, { ok: true, token: 'tok' });
+    assert.deepEqual(b, { ok: true, token: 'tok' });
+    assert.equal(fetchMock.mock.callCount(), 1);
   })
 );
