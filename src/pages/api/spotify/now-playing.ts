@@ -7,6 +7,11 @@ import {
   jsonResponse,
   UpstreamError,
 } from '../../../lib/spotify';
+import { createResponseCache } from '../../../lib/response-cache';
+
+// Public route: one shared upstream lookup per cache window, however many
+// clients (or cache-busting query strings) hit it.
+const cache = createResponseCache();
 
 const ROUTE = 'now-playing';
 const CACHE_CONTROL = 'public, s-maxage=60, stale-while-revalidate=30';
@@ -107,22 +112,24 @@ export const GET: APIRoute = async () => {
     return jsonResponse(MOCK_DATA, CACHE_CONTROL);
   }
 
-  try {
-    const auth = await getAccessToken();
-    if (!auth.ok) {
-      return degradedResponse(ROUTE, auth.reason, auth.detail, MOCK_DATA);
+  return cache.cachedResponse('now-playing', async () => {
+    try {
+      const auth = await getAccessToken();
+      if (!auth.ok) {
+        return degradedResponse(ROUTE, auth.reason, auth.detail, MOCK_DATA);
+      }
+
+      // Try to get currently playing track, then fall back to recently played
+      const track =
+        (await getNowPlaying(auth.token)) ??
+        (await getRecentlyPlayed(auth.token));
+
+      // Nothing playing and nothing recent: legitimate empty state
+      return jsonResponse(track ?? { isPlaying: false }, CACHE_CONTROL);
+    } catch (error) {
+      return degradedFromError(ROUTE, error, MOCK_DATA);
     }
-
-    // Try to get currently playing track, then fall back to recently played
-    const track =
-      (await getNowPlaying(auth.token)) ??
-      (await getRecentlyPlayed(auth.token));
-
-    // Nothing playing and nothing recent: legitimate empty state, not a failure
-    return jsonResponse(track ?? { isPlaying: false }, CACHE_CONTROL);
-  } catch (error) {
-    return degradedFromError(ROUTE, error, MOCK_DATA);
-  }
+  });
 };
 
 // Opt out of prerendering for this API route

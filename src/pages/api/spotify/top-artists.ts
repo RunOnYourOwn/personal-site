@@ -7,6 +7,14 @@ import {
   jsonResponse,
   UpstreamError,
 } from '../../../lib/spotify';
+import {
+  createResponseCache,
+  normalizeTopParams,
+} from '../../../lib/response-cache';
+
+// Public route: parameters are normalized and results cached in-process so
+// cache-busting query strings cannot fan out to Spotify.
+const cache = createResponseCache();
 
 const ROUTE = 'top-artists';
 const CACHE_CONTROL = 'public, s-maxage=3600, stale-while-revalidate=1800';
@@ -131,24 +139,25 @@ async function getTopArtists(
 }
 
 export const GET: APIRoute = async ({ url }) => {
-  const timeRange = url.searchParams.get('time_range') || 'medium_term';
-  const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+  const { timeRange, limit } = normalizeTopParams(url.searchParams);
 
   if (USE_MOCK_DATA) {
     return jsonResponse(MOCK_DATA, CACHE_CONTROL);
   }
 
-  try {
-    const auth = await getAccessToken();
-    if (!auth.ok) {
-      return degradedResponse(ROUTE, auth.reason, auth.detail, MOCK_DATA);
-    }
+  return cache.cachedResponse(`${timeRange}:${limit}`, async () => {
+    try {
+      const auth = await getAccessToken();
+      if (!auth.ok) {
+        return degradedResponse(ROUTE, auth.reason, auth.detail, MOCK_DATA);
+      }
 
-    const data = await getTopArtists(auth.token, timeRange, limit);
-    return jsonResponse(data, CACHE_CONTROL);
-  } catch (error) {
-    return degradedFromError(ROUTE, error, MOCK_DATA);
-  }
+      const data = await getTopArtists(auth.token, timeRange, limit);
+      return jsonResponse(data, CACHE_CONTROL);
+    } catch (error) {
+      return degradedFromError(ROUTE, error, MOCK_DATA);
+    }
+  });
 };
 
 export const prerender = false;

@@ -31,7 +31,20 @@ export type TokenResult =
   | { ok: true; token: string }
   | { ok: false; reason: FailureReason; detail: string };
 
+// Spotify access tokens last ~1h. Reuse one until shortly before expiry
+// instead of calling the token endpoint on every request.
+let cachedToken: { token: string; expiresAt: number } | null = null;
+const TOKEN_EXPIRY_MARGIN_MS = 60_000;
+
+export function resetTokenCache(): void {
+  cachedToken = null;
+}
+
 export async function getAccessToken(): Promise<TokenResult> {
+  if (cachedToken && cachedToken.expiresAt > Date.now()) {
+    return { ok: true, token: cachedToken.token };
+  }
+
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
   const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
@@ -58,7 +71,11 @@ export async function getAccessToken(): Promise<TokenResult> {
     }),
   });
 
-  let data: { access_token?: unknown; error?: unknown } = {};
+  let data: {
+    access_token?: unknown;
+    expires_in?: unknown;
+    error?: unknown;
+  } = {};
   try {
     data = await response.json();
   } catch {
@@ -79,6 +96,14 @@ export async function getAccessToken(): Promise<TokenResult> {
     };
   }
 
+  const lifetimeMs =
+    (typeof data.expires_in === 'number' ? data.expires_in : 0) * 1000;
+  if (lifetimeMs > TOKEN_EXPIRY_MARGIN_MS) {
+    cachedToken = {
+      token: data.access_token,
+      expiresAt: Date.now() + lifetimeMs - TOKEN_EXPIRY_MARGIN_MS,
+    };
+  }
   return { ok: true, token: data.access_token };
 }
 
