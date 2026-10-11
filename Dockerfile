@@ -33,8 +33,8 @@ LABEL org.opencontainers.image.title="Personal Site" \
 
 WORKDIR /app
 
-# Install wget for health checks
-RUN apk add --no-cache wget
+# wget for health checks; libcap lets the unprivileged node user keep binding :80
+RUN apk add --no-cache wget libcap
 
 # Copy built output and package files
 COPY --from=build /app/dist ./dist
@@ -46,6 +46,13 @@ RUN npm ci --omit=dev --ignore-scripts
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=80
+
+# Run as the unprivileged `node` user (uid 1000, shipped in node:20-alpine).
+# The deploy contract publishes :80, so keep that port: grant the node binary
+# only CAP_NET_BIND_SERVICE instead of running as root.
+RUN setcap 'cap_net_bind_service=+ep' "$(readlink -f "$(command -v node)")" \
+    && apk del libcap
+USER node
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:80/ || exit 1
