@@ -35,6 +35,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  import { safeSpotifyImage, safeSpotifyLink } from '../lib/safe-url';
+
   let currentTimeRange = 'short_term';
 
   async function fetchData(endpoint: string, timeRange: string) {
@@ -58,11 +60,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   // Build one list row with DOM APIs: remote strings go through textContent,
   // never through HTML parsing.
+  // Image and link URLs come from the Spotify API; they are allowlisted
+  // before being used as src/href, and dropped when they do not validate.
   function buildItem(
     rank: number,
     name: string,
-    image: string,
-    url: string,
+    imageUrl: unknown,
+    linkUrl: unknown,
     opts: { round: boolean; subtitle?: string }
   ) {
     const li = document.createElement('li');
@@ -72,16 +76,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     rankEl.className = 'rank';
     rankEl.textContent = String(rank);
 
+    const image = safeSpotifyImage(imageUrl);
     const img = document.createElement('img');
-    img.src = image;
+    if (image) img.src = image;
     img.alt = '';
     img.className = opts.round ? 'image image-round' : 'image';
     img.loading = 'lazy';
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener';
+    const url = safeSpotifyLink(linkUrl);
+    const link = document.createElement(url ? 'a' : 'span');
+    if (link instanceof HTMLAnchorElement && url) {
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+    }
     link.textContent = name;
 
     li.append(rankEl, img);
