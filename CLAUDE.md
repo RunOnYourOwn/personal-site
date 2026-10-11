@@ -112,3 +112,43 @@ For detailed information, reference using `@` syntax:
 ---
 
 **Last Updated**: January 2026 | **Live Site**: [aaronbrazier.com](https://aaronbrazier.com)
+
+<!-- argus-config v1 -->
+## Argus coordination (project personal-site)
+
+This repo belongs to the Argus project 'personal-site'. Agents working here:
+
+1. **The board is the coordination surface**: file tasks via the argus MCP
+   (register once: claude mcp add --transport http argus
+   https://argus.aaronbrazier.com/mcp --header "Authorization: Bearer
+   $ARGUS_CAPTURE_TOKEN") or POST /tasks. Every task needs a why; leaf tasks
+   need acceptance. verified is set ONLY by the deterministic checker.
+2. **Declare closures explicitly**: for every task the PR completes, make the
+   first nonblank PR body line "Closes ARGUS-N". Correct body:
+   "Closes ARGUS-N\n\n<why + what changed>". Incorrect: title
+   "Closes ARGUS-N: <title>" with no first body line; the checker ignores the
+   title for this contract. A bare mention never links.
+3. **Never merge directly**: open the PR, then signal
+   POST /landing/{owner}/{name}/ready {"pr_number":N,"task_id":"ARGUS-N"}.
+   The hub serializes rebase -> CI -> merge -> deploy; failures comment on
+   the PR and page.
+4. **Secrets stay out of the repo** (env files / SOPS); bearer tokens live
+   in ~/.argus/agent-runner.env on each machine.
+
+<!-- If this repo deploys ITSELF from its own CI workflow (e.g. a push to
+     master redeploys via Forgejo Actions), deploy_hook stays empty on
+     purpose -- there's no host-runner script to claim. Opt the project in
+     with PATCH /projects/<slug> {"ci_deploy_target":"<bare-id>"}, then add
+     these two calls around the deploy step (docs/reference/ci-deploy-report.md):
+
+curl -sf -X POST https://argus.aaronbrazier.com/deploys/report/start \
+  -H "Authorization: Bearer $ARGUS_CAPTURE_TOKEN" -H 'Content-Type: application/json' \
+  -d "{\"repo\":\"<owner>/<repo>\",\"target\":\"<bare-id>\",\"sha\":\"$GITHUB_SHA\"}"
+
+# ... run the deploy step, then report the outcome ...
+
+curl -sf -X POST https://argus.aaronbrazier.com/deploys/report/complete \
+  -H "Authorization: Bearer $ARGUS_CAPTURE_TOKEN" -H 'Content-Type: application/json' \
+  -d "{\"repo\":\"<owner>/<repo>\",\"target\":\"<bare-id>\",\"sha\":\"$GITHUB_SHA\",\"ok\":true,\"detail\":\"deployed via forgejo actions run $GITHUB_RUN_ID\"}"
+-->
+<!-- /argus-config -->
