@@ -49,6 +49,56 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
   }
 
+  function emptyItem(className: string, text: string) {
+    const li = document.createElement('li');
+    li.className = className;
+    li.textContent = text;
+    return li;
+  }
+
+  // Build one list row with DOM APIs: remote strings go through textContent,
+  // never through HTML parsing.
+  function buildItem(
+    rank: number,
+    name: string,
+    image: string,
+    url: string,
+    opts: { round: boolean; subtitle?: string }
+  ) {
+    const li = document.createElement('li');
+    li.className = 'item';
+
+    const rankEl = document.createElement('span');
+    rankEl.className = 'rank';
+    rankEl.textContent = String(rank);
+
+    const img = document.createElement('img');
+    img.src = image;
+    img.alt = '';
+    img.className = opts.round ? 'image image-round' : 'image';
+    img.loading = 'lazy';
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = name;
+
+    li.append(rankEl, img);
+    if (opts.subtitle === undefined) {
+      li.append(link);
+    } else {
+      const info = document.createElement('div');
+      info.className = 'info';
+      const sub = document.createElement('span');
+      sub.className = 'subtitle';
+      sub.textContent = opts.subtitle;
+      info.append(link, sub);
+      li.append(info);
+    }
+    return li;
+  }
+
   function renderArtists(
     data: {
       artists: Array<{ name: string; image: string; url: string }>;
@@ -58,21 +108,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     if (!container) return;
 
     if (!data?.artists?.length) {
-      container.innerHTML = '<li class="empty">No data available</li>';
+      container.replaceChildren(emptyItem('empty', 'No data available'));
       return;
     }
 
-    container.innerHTML = data.artists
-      .map(
-        (artist, i) => `
-        <li class="item">
-          <span class="rank">${i + 1}</span>
-          <img src="${artist.image}" alt="" class="image image-round" loading="lazy" />
-          <a href="${artist.url}" target="_blank" rel="noopener">${artist.name}</a>
-        </li>
-      `
+    container.replaceChildren(
+      ...data.artists.map((artist, i) =>
+        buildItem(i + 1, artist.name, artist.image, artist.url, {
+          round: true,
+        })
       )
-      .join('');
+    );
   }
 
   function renderTracks(
@@ -89,24 +135,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     if (!container) return;
 
     if (!data?.tracks?.length) {
-      container.innerHTML = '<li class="empty">No data available</li>';
+      container.replaceChildren(emptyItem('empty', 'No data available'));
       return;
     }
 
-    container.innerHTML = data.tracks
-      .map(
-        (track, i) => `
-        <li class="item">
-          <span class="rank">${i + 1}</span>
-          <img src="${track.image}" alt="" class="image" loading="lazy" />
-          <div class="info">
-            <a href="${track.url}" target="_blank" rel="noopener">${track.name}</a>
-            <span class="subtitle">${track.artist}</span>
-          </div>
-        </li>
-      `
+    container.replaceChildren(
+      ...data.tracks.map((track, i) =>
+        buildItem(i + 1, track.name, track.image, track.url, {
+          round: false,
+          subtitle: track.artist,
+        })
       )
-      .join('');
+    );
   }
 
   async function loadData(timeRange: string) {
@@ -115,9 +155,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const artistsList = document.getElementById('artists-list');
     const tracksList = document.getElementById('tracks-list');
     if (artistsList)
-      artistsList.innerHTML = '<li class="loading">Loading...</li>';
+      artistsList.replaceChildren(emptyItem('loading', 'Loading...'));
     if (tracksList)
-      tracksList.innerHTML = '<li class="loading">Loading...</li>';
+      tracksList.replaceChildren(emptyItem('loading', 'Loading...'));
 
     const [artists, tracks] = await Promise.all([
       fetchData('top-artists', timeRange),

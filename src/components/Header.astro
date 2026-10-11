@@ -22,6 +22,19 @@ import DarkModeToggle from './DarkModeToggle.astro';
 </header>
 
 <script>
+  import { safeSpotifyLink } from '../lib/safe-url';
+
+  // Static markup only (no remote data) - safe to assign via innerHTML.
+  const PLAYING_ICON = `<span class="now-playing-icon">
+      <span class="now-playing-bar"></span>
+      <span class="now-playing-bar"></span>
+      <span class="now-playing-bar"></span>
+    </span>`;
+  const PAUSED_ICON = `<svg class="now-playing-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polygon points="10 8 16 12 10 16 10 8"></polygon>
+    </svg>`;
+
   async function fetchNowPlaying() {
     try {
       const response = await fetch('/api/spotify/now-playing');
@@ -31,35 +44,36 @@ import DarkModeToggle from './DarkModeToggle.astro';
       const container = document.getElementById('now-playing');
       if (!container) return;
 
-      if (!data.title) {
-        container.innerHTML = '';
+      const href = safeSpotifyLink(data.songUrl);
+      if (!data.title || !href) {
+        container.replaceChildren();
         return;
       }
 
-      const icon = data.isPlaying
-        ? `<span class="now-playing-icon">
-            <span class="now-playing-bar"></span>
-            <span class="now-playing-bar"></span>
-            <span class="now-playing-bar"></span>
-          </span>`
-        : `<svg class="now-playing-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polygon points="10 8 16 12 10 16 10 8"></polygon>
-          </svg>`;
+      // Remote fields (title, artist, songUrl) are only ever set through
+      // textContent / validated href - never parsed as HTML.
+      const link = document.createElement('a');
+      link.href = href;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.className = 'now-playing-link';
 
-      container.innerHTML = `
-        <a href="${data.songUrl}" target="_blank" rel="noopener" class="now-playing-link">
-          ${icon}
-          <span class="now-playing-track-wrapper">
-            <span class="now-playing-track">${data.title} – ${data.artist}</span>
-          </span>
-        </a>
-      `;
+      const icon = document.createElement('span');
+      icon.innerHTML = data.isPlaying ? PLAYING_ICON : PAUSED_ICON;
+      if (icon.firstElementChild) link.append(icon.firstElementChild);
+
+      const wrapper = document.createElement('span');
+      wrapper.className = 'now-playing-track-wrapper';
+      const track = document.createElement('span');
+      track.className = 'now-playing-track';
+      track.textContent = `${data.title} \u2013 ${data.artist}`;
+      wrapper.append(track);
+      link.append(wrapper);
+
+      container.replaceChildren(link);
 
       // Check if text overflows and needs scrolling
-      const track = container.querySelector('.now-playing-track');
-      const wrapper = container.querySelector('.now-playing-track-wrapper');
-      if (track && wrapper && track.scrollWidth > wrapper.clientWidth) {
+      if (track.scrollWidth > wrapper.clientWidth) {
         track.classList.add('scrolling');
       }
     } catch {
