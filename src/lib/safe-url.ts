@@ -22,3 +22,26 @@ export function safeUrl(value: unknown, prefix: string): string | null {
 export function safeSpotifyLink(value: unknown): string | null {
   return safeUrl(value, SPOTIFY_LINK_PREFIX);
 }
+
+/**
+ * Spotify artwork is served from *.scdn.co and *.spotifycdn.com. Returns the
+ * URL when it is https on one of those hosts, otherwise null.
+ */
+export function safeSpotifyImage(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname;
+    const ok =
+      parsed.protocol === 'https:' &&
+      !parsed.username &&
+      !parsed.password &&
+      (host === 'scdn.co' ||
+        host.endsWith('.scdn.co') ||
+        host === 'spotifycdn.com' ||
+        host.endsWith('.spotifycdn.com'));
+    return ok ? value : null;
+  } catch {
+    return null;
+  }
+}
