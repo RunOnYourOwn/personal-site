@@ -37,7 +37,7 @@ const featuredProjects = allProjects
           <ul class="post-list">
             {latestPosts.map(post => (
               <li class="post-item">
-                <a href={`/blog/${post.slug}`} class="post-link">
+                <a href={`/blog/${post.id}`} class="post-link">
                   <span class="post-title">{post.data.title}</span>
                   <span class="post-date">
                     <FormattedDate date={post.data.pubDate} />
@@ -61,7 +61,7 @@ const featuredProjects = allProjects
             {featuredProjects.map(project => (
               <li class="project-item">
                 <a
-                  href={project.data.link || `/projects/${project.slug}`}
+                  href={project.data.link || `/projects/${project.id}`}
                   class="project-link"
                   target={project.data.link ? '_blank' : undefined}
                   rel={project.data.link ? 'noopener' : undefined}

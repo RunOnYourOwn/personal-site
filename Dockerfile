@@ -1,5 +1,5 @@
 # Multi-stage build for Astro site with Node adapter
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ ENV SITE_URL=${SITE_URL}
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 
 ARG VERSION=dev
 ARG BUILD_DATE
@@ -47,7 +47,7 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=80
 
-# Run as the unprivileged `node` user (uid 1000, shipped in node:20-alpine).
+# Run as the unprivileged `node` user (uid 1000, shipped in node:22-alpine).
 # The deploy contract publishes :80, so keep that port: grant the node binary
 # only CAP_NET_BIND_SERVICE instead of running as root.
 RUN setcap 'cap_net_bind_service=+ep' "$(readlink -f "$(command -v node)")" \
