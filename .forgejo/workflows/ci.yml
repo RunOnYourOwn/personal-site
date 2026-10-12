@@ -1,0 +1,47 @@
+# CI — PR-side validation. Gives the landing queue a check to gate on.
+# No Docker image build here; cd.yml builds and deploys post-merge.
+
+name: CI
+on:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: homelab-infra
+    steps:
+      - name: Bootstrap (node for JS actions + git)
+        run: |
+          set -euo pipefail
+          command -v node >/dev/null 2>&1 || { apt-get update -q && apt-get install -y -q nodejs; }
+          command -v git  >/dev/null 2>&1 || { apt-get update -q && apt-get install -y -q git; }
+
+      - name: Checkout
+        uses: https://github.com/actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: https://github.com/actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx astro check
+
+      - name: Build
+        run: npx astro build
+        env:
+          SITE_URL: https://aaronbrazier.com
