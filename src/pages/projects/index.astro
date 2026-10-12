@@ -33,7 +33,7 @@ const sortedProjects = projects.sort((a, b) => {
           {sortedProjects.map(project => (
             <li class="project-item">
               <a
-                href={project.data.link || `/projects/${project.slug}`}
+                href={project.data.link || `/projects/${project.id}`}
                 class="project-link"
                 target={project.data.link ? '_blank' : undefined}
                 rel={project.data.link ? 'noopener' : undefined}
