@@ -55,7 +55,7 @@ RUN setcap 'cap_net_bind_service=+ep' "$(readlink -f "$(command -v node)")" \
 USER node
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:80/ || exit 1
+  CMD wget -qO- http://localhost:80/healthz || exit 1
 
 EXPOSE 80
 
