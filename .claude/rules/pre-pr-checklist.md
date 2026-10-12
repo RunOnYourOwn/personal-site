@@ -84,7 +84,7 @@ git tag -l "v$(cat VERSION)" # must print nothing, else CD skips the build
 
 ### Must Pass
 
-- [ ] Local checks pass (lint, type-check, test, build). There is no PR CI workflow yet; the only workflow is the CD build on `main`
+- [ ] Local checks pass (lint, type-check, test, build). The PR CI workflow (`.forgejo/workflows/ci.yml`, job `CI / validate`) runs the same checks on Node 22; the CD build on `main` is separate
 - [ ] No broken links or missing images
 - [ ] Dark mode works on new/modified components
 - [ ] Mobile responsive
