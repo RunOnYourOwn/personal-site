@@ -48,7 +48,7 @@ release scripts were removed in the move to Forgejo.
 
 - [ ] **Descriptive commit messages** - Explain what and why
 - [ ] **No merge conflicts** - Rebase on latest main if needed
-- [ ] **Co-Authored-By line** - when an AI agent wrote the change, add its `Co-Authored-By:` trailer
+- [ ] **No attribution** - no `Co-Authored-By`, session link or "Generated with" footer in commits or the PR description
 
 ## Quick Pre-PR Commands
 
